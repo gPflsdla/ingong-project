@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LabelLens Korea</title>
+  <meta name="description" content="Check Korean food labels for allergens and diet rules, right in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- 머리말: 앱 이름과 한 줄 소개 (PRD #1, #6) -->
+    <header class="site-header">
+      <h1>LabelLens Korea<span class="ko">한국 식품 라벨 체크</span></h1>
+      <p>Snap the ingredients panel (원재료명) on a Korean food package. LabelLens reads the Korean text in your browser and tells you whether it fits your allergies and diet.</p>
+    </header>
+
+    <!-- 2단 배치: 왼쪽 입력, 오른쪽 결과. 휴대폰에서는 한 줄로 쌓임 (PRD #3, #7) -->
+    <main class="grid">
+      <div class="col">
+        <!-- Step 1: 내 제한 고르기. 선택 버튼은 2단계에서 추가 -->
+        <section class="panel" aria-labelledby="h-rules">
+          <span class="step">Step 1</span>
+          <h2 id="h-rules">What do you avoid?</h2>
+          <div class="chipset">
+            <span class="lbl">Diet</span>
+            <div class="chips" id="dietChips"><span class="placeholder">Diet options will appear here.</span></div>
+          </div>
+          <div class="chipset">
+            <span class="lbl">Allergies (Korean labeling list)</span>
+            <div class="chips" id="allergyChips"><span class="placeholder">Allergy options will appear here.</span></div>
+          </div>
+        </section>
+
+        <!-- Step 2: 라벨 넣기. 사진·카메라는 4단계, 글자 입력과 예시는 3단계에서 추가 -->
+        <section class="panel" aria-labelledby="h-label">
+          <span class="step">Step 2</span>
+          <h2 id="h-label">Add the label</h2>
+          <div class="drop">
+            <p>Photo and camera input will appear here.</p>
+          </div>
+          <label class="tl" for="text">Label text</label>
+          <textarea id="text" spellcheck="false" lang="ko" placeholder="원재료명: 소맥분(밀), 설탕, …" disabled></textarea>
+        </section>
+      </div>
+
+      <!-- 결과 구역: 판정, 이유, 성분표 (3단계와 5단계에서 채움) -->
+      <div class="col" aria-live="polite">
+        <div class="verdict idle" id="verdict">
+          <div class="head">Waiting for a label</div>
+          <p>Add a photo or type the ingredients to see the result here.</p>
+        </div>
+        <section class="panel">
+          <h2>Why</h2>
+          <p class="hint">Reasons for the result will be listed here.</p>
+        </section>
+        <section class="panel">
+          <h2>Ingredients we recognized</h2>
+          <p class="hint">Korean ingredient names and their English meaning will be listed here.</p>
+        </section>
+      </div>
+    </main>
+
+    <footer>LabelLens matches Korean ingredient names against a built-in dictionary. Always read the label yourself or ask staff when an allergy is serious. Photos never leave your device.</footer>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>
