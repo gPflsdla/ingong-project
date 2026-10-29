@@ -12,42 +12,49 @@
 </head>
 <body>
   <div class="wrap">
-    <!-- 머리말: 앱 이름과 한 줄 소개 (PRD #1, #6) -->
+    <!-- 머리말: 앱 이름, 한 줄 소개, 언어 전환 (PRD #1, #6, #4-7) -->
     <header class="site-header">
-      <h1>LabelLens Korea<span class="ko">한국 식품 라벨 체크</span></h1>
-      <p>Snap the ingredients panel (원재료명) on a Korean food package. LabelLens reads the Korean text in your browser and tells you whether it fits your allergies and diet.</p>
+      <div class="title-row">
+        <h1>LabelLens Korea<span class="ko">한국 식품 라벨 체크</span></h1>
+        <div class="lang" role="group" aria-label="Language / 언어">
+          <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
+          <button type="button" data-lang="en" aria-pressed="false">English</button>
+        </div>
+      </div>
+      <p data-i18n="tagline"></p>
     </header>
 
     <!-- 2단 배치: 왼쪽 입력, 오른쪽 결과. 휴대폰에서는 한 줄로 쌓임 (PRD #3, #7) -->
     <main class="grid">
       <div class="col">
-        <!-- Step 1: 내 제한 고르기 (PRD #4-1). 버튼은 js/app.js가 js/restrictions.js 목록으로 그림 -->
+        <!-- 1단계 화면: 내 제한 고르기 (PRD #4-1). 버튼은 js/app.js가 js/restrictions.js 목록으로 그림 -->
         <section class="panel" aria-labelledby="h-rules">
-          <span class="step">Step 1</span>
-          <h2 id="h-rules">What do you avoid?</h2>
+          <span class="step" data-i18n="step1"></span>
+          <h2 id="h-rules" data-i18n="rulesTitle"></h2>
           <div class="chipset">
-            <span class="lbl">Diet</span>
+            <span class="lbl" data-i18n="diet"></span>
             <div class="chips" id="dietChips"></div>
           </div>
           <div class="chipset">
-            <span class="lbl">Allergies (Korean labeling list)</span>
+            <span class="lbl" data-i18n="allergies"></span>
             <div class="chips" id="allergyChips"></div>
           </div>
           <p class="summary" id="ruleSummary"></p>
-          <p class="hint">Your choices are saved in this browser only.</p>
+          <p class="hint" data-i18n="savedHint"></p>
         </section>
 
-        <!-- Step 2: 라벨 넣기. 글자 입력과 예시는 3단계, 사진·카메라는 4단계 -->
+        <!-- 2단계 화면: 라벨 넣기 (PRD #4-2, #4-6) -->
         <section class="panel" aria-labelledby="h-label">
-          <span class="step">Step 2</span>
-          <h2 id="h-label">Add the label</h2>
-          <!-- 사진 넣기: 앱 안 카메라(4-5), 사진 고르기·끌어다 놓기·붙여넣기(4-1) -->
+          <span class="step" data-i18n="step2"></span>
+          <h2 id="h-label" data-i18n="labelTitle"></h2>
+
+          <!-- 사진 넣기: 앱 안 카메라, 사진 고르기·끌어다 놓기·붙여넣기 -->
           <div class="drop" id="drop">
             <div class="drop-btns">
-              <button class="btn primary" type="button" id="cameraBtn">Open camera</button>
-              <button class="btn" type="button" id="pickBtn">Choose photo</button>
+              <button class="btn primary" type="button" id="cameraBtn" data-i18n="openCamera"></button>
+              <button class="btn" type="button" id="pickBtn" data-i18n="choosePhoto"></button>
             </div>
-            <p>Or drop / paste an image here. Get close to the 원재료명 box for best results.</p>
+            <p data-i18n="dropHint"></p>
             <input type="file" id="file" accept="image/*" hidden>
           </div>
 
@@ -55,48 +62,62 @@
           <div class="camera" id="camera" hidden>
             <div class="cam-view">
               <video id="video" playsinline muted autoplay></video>
-              <div class="guide" id="guide"><span>Fit the 원재료명 text inside this box</span></div>
+              <div class="guide" id="guide"><span data-i18n="guide"></span></div>
             </div>
             <div class="cam-ctrls">
-              <button class="btn primary big" type="button" id="shutterBtn">Take photo</button>
-              <button class="btn" type="button" id="closeCamBtn">Close camera</button>
+              <button class="btn primary big" type="button" id="shutterBtn" data-i18n="takePhoto"></button>
+              <button class="btn" type="button" id="closeCamBtn" data-i18n="closeCamera"></button>
             </div>
           </div>
 
-          <!-- 인식 진행 상황 (4-4) -->
+          <!-- 인식 진행 상황 -->
           <div class="preview" id="preview" hidden>
-            <img id="previewImg" alt="The label photo you added">
+            <img id="previewImg" data-i18n-alt="previewAlt" alt="">
             <div class="ocr-status">
-              <span id="ocrMsg">Reading Korean text…</span>
+              <span id="ocrMsg"></span>
               <div class="bar"><span id="ocrBar"></span></div>
             </div>
           </div>
           <p class="notice" id="notice" hidden></p>
-          <div class="samples" id="samples">Try a sample:</div>
-          <label class="tl" for="text">Label text (results update as you type)</label>
+
+          <div class="samples" id="samples"></div>
+          <label class="tl" for="text" data-i18n="textLabel"></label>
           <textarea id="text" spellcheck="false" lang="ko" placeholder="원재료명: 소맥분(밀), 설탕, …"></textarea>
         </section>
       </div>
 
-      <!-- 결과 구역: 판정, 이유, 성분표 (3단계와 5단계에서 채움) -->
+      <!-- 결과 구역: 판정, 이유, 성분표, 원문 강조 (PRD #4-3, #4-4, #4-5) -->
       <div class="col" aria-live="polite">
         <div class="verdict idle" id="verdict"></div>
-        <section class="panel">
-          <h2>Why</h2>
-          <p class="hint">Reasons for the result will be listed here.</p>
+        <section class="panel" id="reasonPanel" hidden>
+          <h2 data-i18n="why"></h2>
+          <ul class="reasons" id="reasons"></ul>
         </section>
         <section class="panel">
-          <h2>Ingredients we recognized</h2>
-          <p class="hint">Korean ingredient names and their English meaning will be listed here.</p>
+          <h2 data-i18n="ingredients"></h2>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th data-i18n="colKo"></th><th data-i18n="colEn"></th><th data-i18n="colNotes"></th></tr></thead>
+              <tbody id="ingTable"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel">
+          <details>
+            <summary data-i18n="showMarked"></summary>
+            <div class="marked" id="marked"></div>
+          </details>
         </section>
       </div>
     </main>
 
-    <footer>LabelLens matches Korean ingredient names against a built-in dictionary. Always read the label yourself or ask staff when an allergy is serious. Photos never leave your device.</footer>
+    <footer data-i18n="footer"></footer>
   </div>
+
   <!-- 브라우저 안에서 동작하는 한국어 글자 인식 라이브러리 (PRD #7) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
   <script src="js/restrictions.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/dictionary.js"></script>
   <script src="js/matcher.js"></script>
   <script src="js/samples.js"></script>

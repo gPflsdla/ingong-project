@@ -3,7 +3,7 @@
 // 화면과 상관없는 순수 함수만 둠. 그래서 tests/index.html에서 그대로 시험할 수 있음
 //   LL.findIngredients(text)      → 글자에서 찾은 성분 목록
 //   LL.evaluate(hits, prefs)      → 사용자 제한에 걸리는 이유 목록
-//   LL.verdict(hits, reasons, prefs) → "none" | "bad" | "warn" | "ok"
+//   LL.verdict(hits, reasons, prefs) → "none" | "unknown" | "bad" | "warn" | "ok"
 // =========================================================
 window.LL = window.LL || {};
 
@@ -35,8 +35,18 @@ window.LL = window.LL || {};
     return { compact: compact, map: map };
   }
 
+  // "이 제품은 땅콩을 사용한 제품과 같은 제조시설에서 제조하고 있습니다" 문장의 범위를 찾음 (5-3)
+  // 이 범위의 성분은 원재료가 아니라 혼입 가능성 (3단계에서 원재료로 잘못 판정된 것을 보고 추가)
+  function facilitySpan(c) {
+    var m = c.search(/(같은|동일한|동일)(제조)?시설/);
+    if (m === -1) return null;
+    var lineStart = Math.max(c.lastIndexOf("\n", m), c.lastIndexOf(".", m)) + 1;
+    var s1 = c.lastIndexOf("이제품은", m);
+    return { start: s1 >= lineStart ? s1 : lineStart, end: m };
+  }
+
   LL.findIngredients = function (text) {
-    var t = compactText(text || ""), c = t.compact;
+    var t = compactText(text || ""), c = t.compact, fac = facilitySpan(c);
     var used = new Array(c.length).fill(false), hits = [];
     // 사전은 긴 단어 순서로 정렬돼 있음. 이미 쓴 글자는 다시 쓰지 않음
     LL.DICT.forEach(function (entry) {
@@ -48,7 +58,7 @@ window.LL = window.LL || {};
         if (!free) continue;
         if (entry.ko.length === 1 && !isWholeItem(c, idx, end)) continue;
         for (k = idx; k < end; k++) used[k] = true;
-        hits.push({ entry: entry, start: t.map[idx], end: t.map[end - 1] + 1 });
+        hits.push({ entry: entry, start: t.map[idx], end: t.map[end - 1] + 1, facility: !!(fac && idx >= fac.start && idx < fac.end) });
       }
     });
     hits.sort(function (a, b) { return a.start - b.start; });
@@ -67,6 +77,11 @@ window.LL = window.LL || {};
     }
     hits.forEach(function (h) {
       var tags = h.entry.tags;
+      // 같은 제조시설 문장의 성분: 알레르기만 "혼입 가능성"(확인 필요)으로, 식단 판정에는 쓰지 않음
+      if (h.facility) {
+        prefs.allergies.forEach(function (a) { if (tags.indexOf(a) !== -1) add("warn", "facility", a, a, h.entry.ko); });
+        return;
+      }
       // 알레르기: 태그가 있으면 먹을 수 없음, "~일 수 있음" 태그면 확인 필요
       prefs.allergies.forEach(function (a) {
         if (tags.indexOf(a) !== -1) add("bad", "allergy", a, a, h.entry.ko);
@@ -87,6 +102,8 @@ window.LL = window.LL || {};
 
   LL.verdict = function (hits, reasons, prefs) {
     if (!prefs.diets.length && !prefs.allergies.length) return "none";
+    // 원재료에서 아는 성분을 하나도 못 찾았으면 "문제 없음"이라고 하지 않음 (5-5)
+    if (!hits.some(function (h) { return !h.facility; })) return "unknown";
     if (reasons.some(function (r) { return r.level === "bad"; })) return "bad";
     if (reasons.length) return "warn";
     return "ok";
