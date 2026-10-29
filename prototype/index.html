@@ -1,0 +1,494 @@
+<title>LabelLens Korea</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: header, then two columns: [my rules + label input] | [verdict + details]. Stacks to one column on phones. */
+:root {
+  --bg: #F4F5F8;
+  --surface: #FFFFFF;
+  --ink: #161A2B;
+  --muted: #5D6377;
+  --line: #DFE2EA;
+  --accent: #3446D3;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E7EAFB;
+  --bad: #C0262D;
+  --bad-soft: #FCE7E8;
+  --warn: #9A5A00;
+  --warn-soft: #FDF0D9;
+  --ok: #167A49;
+  --ok-soft: #E1F3E9;
+  --mark: #FFE58F;
+  --font-display: "Bricolage Grotesque", "Noto Sans KR", system-ui, sans-serif;
+  --font-body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10121B; --surface: #181B28; --ink: #E7E9F2; --muted: #9EA3B8; --line: #2A2E40;
+    --accent: #8C98FF; --accent-ink: #0E1020; --accent-soft: #222844;
+    --bad: #FF7A80; --bad-soft: #3A1E22; --warn: #F0BA5C; --warn-soft: #362A18; --ok: #6ED39E; --ok-soft: #17302A; --mark: #6B5A1C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10121B; --surface: #181B28; --ink: #E7E9F2; --muted: #9EA3B8; --line: #2A2E40;
+  --accent: #8C98FF; --accent-ink: #0E1020; --accent-soft: #222844;
+  --bad: #FF7A80; --bad-soft: #3A1E22; --warn: #F0BA5C; --warn-soft: #362A18; --ok: #6ED39E; --ok-soft: #17302A; --mark: #6B5A1C;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1140px; margin: 0 auto; padding-block: 26px 44px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+
+header h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 5vw, 44px); line-height: 1; margin: 0; letter-spacing: -.01em; }
+header h1 .ko { font-family: var(--font-body); font-weight: 700; font-size: .42em; color: var(--accent); margin-left: 10px; letter-spacing: 0; vertical-align: middle; }
+header p { margin: 8px 0 0; color: var(--muted); max-width: 64ch; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.step { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 20px; margin: 0; line-height: 1.2; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+
+.chipset { display: flex; flex-direction: column; gap: 6px; }
+.chipset .lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: inherit; font-size: 13.5px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
+.chip .k { font-size: 11.5px; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip[aria-pressed="true"] .k { color: var(--accent-ink); opacity: .8; }
+.chip:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.drop { border: 2px dashed var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; background: var(--bg); }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.preview { display: flex; gap: 12px; align-items: center; }
+.preview img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); flex: none; }
+.ocr-status { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.samples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+textarea { width: 100%; min-height: 170px; resize: vertical; font: inherit; font-size: 14.5px; line-height: 1.7; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+label.tl { font-size: 13px; font-weight: 700; color: var(--muted); }
+
+button.btn { font: inherit; font-size: 14px; font-weight: 500; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 7px 14px; cursor: pointer; }
+button.btn:hover { border-color: var(--accent); }
+button.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+button.btn.small { font-size: 13px; padding: 4px 10px; }
+
+/* Verdict */
+.verdict { border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 6px; border: 1px solid transparent; }
+.verdict.bad { background: var(--bad-soft); border-color: var(--bad); }
+.verdict.warn { background: var(--warn-soft); border-color: var(--warn); }
+.verdict.ok { background: var(--ok-soft); border-color: var(--ok); }
+.verdict.idle { background: var(--surface); border-color: var(--line); }
+.verdict .head { font-family: var(--font-display); font-weight: 800; font-size: clamp(24px, 3.4vw, 30px); line-height: 1.1; }
+.verdict.bad .head { color: var(--bad); } .verdict.warn .head { color: var(--warn); } .verdict.ok .head { color: var(--ok); }
+.verdict .ko { font-size: 14px; font-weight: 700; }
+.verdict p { margin: 0; font-size: 14px; }
+.example-note { font-size: 12.5px; color: var(--muted); }
+
+.reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.reason { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 10px; align-items: start; }
+.reason .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 7px; }
+.reason.bad .dot { background: var(--bad); } .reason.warn .dot { background: var(--warn); }
+.reason .what { font-weight: 700; }
+.reason .why { font-size: 13.5px; color: var(--muted); }
+.kterm { font-weight: 700; background: var(--mark); color: var(--ink); padding: 0 4px; border-radius: 3px; }
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .03em; }
+td .tag { display: inline-block; font-size: 11.5px; padding: 0 6px; border-radius: 4px; background: var(--bg); color: var(--muted); margin: 1px 2px 1px 0; border: 1px solid var(--line); }
+td .tag.hit { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+td .tag.chk { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.marked { font-size: 14px; line-height: 1.9; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; background: var(--bg); border-radius: 8px; padding: 12px; }
+.marked mark { background: var(--mark); color: var(--ink); border-radius: 3px; padding: 0 2px; }
+.marked mark.x { background: var(--bad-soft); color: var(--bad); font-weight: 700; }
+.marked .fac { color: var(--muted); }
+details summary { cursor: pointer; font-weight: 700; font-size: 14px; }
+footer { font-size: 12.5px; color: var(--muted); max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>LabelLens Korea<span class="ko">한국 식품 라벨 체크</span></h1>
+    <p>Snap the ingredients panel (원재료명) on a Korean food package. LabelLens reads the Korean text in your browser and tells you whether it fits your allergies and diet.</p>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <section class="panel" aria-labelledby="h-rules">
+        <span class="step">Step 1</span>
+        <h2 id="h-rules">What do you avoid?</h2>
+        <div class="chipset"><span class="lbl">Diet</span><div class="chips" id="dietChips"></div></div>
+        <div class="chipset"><span class="lbl">Allergies (Korean labeling list)</span><div class="chips" id="allergyChips"></div></div>
+        <p class="hint">Your choices are saved in this browser only.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="h-label">
+        <span class="step">Step 2</span>
+        <h2 id="h-label">Add the label</h2>
+        <div class="drop" id="drop">
+          <button class="btn primary" type="button" id="pickBtn">Take or choose a photo</button>
+          <p>Or drop / paste an image here. Crop close to the 원재료명 box for best results.</p>
+          <input type="file" id="file" accept="image/*" capture="environment" hidden>
+        </div>
+        <div class="preview" id="preview" hidden>
+          <img id="previewImg" alt="Label photo you added">
+          <div class="ocr-status"><span id="ocrMsg">Reading Korean text…</span><div class="bar"><span id="ocrBar"></span></div></div>
+        </div>
+        <div class="samples">Try a sample:
+          <button class="btn small" type="button" data-sample="0">Choco snack</button>
+          <button class="btn small" type="button" data-sample="1">Instant ramen</button>
+          <button class="btn small" type="button" data-sample="2">Peach drink</button>
+        </div>
+        <label class="tl" for="text">Label text (fix any misread words, results update as you type)</label>
+        <textarea id="text" spellcheck="false" lang="ko"></textarea>
+      </section>
+    </div>
+
+    <div class="col" aria-live="polite">
+      <div class="verdict idle" id="verdict"></div>
+      <section class="panel" id="reasonPanel">
+        <h2>Why</h2>
+        <ul class="reasons" id="reasons"></ul>
+      </section>
+      <section class="panel">
+        <h2>Ingredients we recognized</h2>
+        <div class="tbl-wrap"><table><thead><tr><th>Korean</th><th>English</th><th>Notes</th></tr></thead><tbody id="ingTable"></tbody></table></div>
+      </section>
+      <section class="panel">
+        <details>
+          <summary>Show the label text with highlights</summary>
+          <div class="marked" id="marked" style="margin-top:10px"></div>
+        </details>
+      </section>
+    </div>
+  </div>
+
+  <footer>LabelLens matches Korean ingredient names against a built-in dictionary. Text recognition can misread small or blurry print, and some ingredients (flavorings, emulsifiers) do not reveal their source. Always read the label yourself or ask staff when an allergy is serious. Photos never leave your device.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ================= Restrictions =================
+  var ALLERGENS = [
+    ["egg", "Egg", "알류"], ["milk", "Milk", "우유"], ["buckwheat", "Buckwheat", "메밀"], ["peanut", "Peanut", "땅콩"],
+    ["soy", "Soy", "대두"], ["wheat", "Wheat", "밀"], ["mackerel", "Mackerel", "고등어"], ["crab", "Crab", "게"],
+    ["shrimp", "Shrimp", "새우"], ["pork", "Pork", "돼지고기"], ["peach", "Peach", "복숭아"], ["tomato", "Tomato", "토마토"],
+    ["sulfite", "Sulfites", "아황산류"], ["walnut", "Walnut", "호두"], ["chicken", "Chicken", "닭고기"], ["beef", "Beef", "쇠고기"],
+    ["squid", "Squid", "오징어"], ["shellfish", "Shellfish", "조개류"], ["pinenut", "Pine nut", "잣"]
+  ];
+  // Each diet: which ingredient tags break it ("no") and which need a second look ("check")
+  var DIETS = [
+    { id: "vegan", en: "Vegan", ko: "비건", no: ["meat", "fish", "seafood", "milk", "egg", "honey", "gelatin", "insect"], check: ["maybeMilk", "maybeEgg"] },
+    { id: "vegetarian", en: "Vegetarian", ko: "채식(락토오보)", no: ["meat", "fish", "seafood", "gelatin", "insect"], check: [] },
+    { id: "halal", en: "Halal", ko: "할랄", no: ["pork", "alcohol"], check: ["gelatin", "beef", "chicken", "meatOther"] },
+    { id: "nopork", en: "No pork", ko: "돼지고기 X", no: ["pork"], check: ["gelatin"] },
+    { id: "noalcohol", en: "No alcohol", ko: "알코올 X", no: ["alcohol"], check: [] },
+    { id: "glutenfree", en: "Gluten-free", ko: "글루텐 프리", no: ["wheat", "barley", "rye"], check: ["maybeWheat", "oat"] }
+  ];
+  var TAG_EN = { meat: "meat", fish: "fish", seafood: "seafood", milk: "dairy", egg: "egg", honey: "honey", gelatin: "gelatin (source often unknown)", insect: "insect-derived",
+    pork: "pork", alcohol: "alcohol", beef: "beef (slaughter method unknown)", chicken: "chicken (slaughter method unknown)", meatOther: "meat (slaughter method unknown)",
+    wheat: "wheat", barley: "barley", rye: "rye", oat: "oats (often cross-contaminated)", maybeMilk: "may contain dairy", maybeEgg: "may contain egg", maybeWheat: "often contains wheat" };
+
+  // ================= Dictionary: [Korean, English, tags] =================
+  // Allergen tags use the allergen ids above. Entries with no tags exist to stop false matches (e.g. 카카오버터 is not butter).
+  var DICT = [
+    // wheat / gluten
+    ["소맥분", "wheat flour", "wheat"], ["밀가루", "wheat flour", "wheat"], ["강력분", "bread flour (wheat)", "wheat"], ["중력분", "all-purpose flour (wheat)", "wheat"],
+    ["박력분", "cake flour (wheat)", "wheat"], ["밀글루텐", "wheat gluten", "wheat"], ["글루텐", "gluten (wheat)", "wheat"], ["밀전분", "wheat starch", "wheat"],
+    ["소맥", "wheat", "wheat"], ["빵가루", "breadcrumbs (wheat)", "wheat"], ["밀", "wheat", "wheat"], ["보리", "barley", "barley"], ["맥아", "malt (barley)", "barley"],
+    ["엿기름", "malt (barley)", "barley"], ["호밀", "rye", "rye"], ["귀리", "oats", "oat"], ["오트밀", "oatmeal", "oat"],
+    ["간장", "soy sauce (soy, usually wheat)", "soy maybeWheat"], ["양조간장", "brewed soy sauce (soy, wheat)", "soy wheat"], ["고추장", "red pepper paste (often wheat)", "maybeWheat"],
+    ["된장", "soybean paste", "soy maybeWheat"], ["춘장", "black bean paste (wheat, soy)", "soy wheat"],
+    // soy
+    ["대두", "soybean", "soy"], ["대두유", "soybean oil", "soy"], ["콩기름", "soybean oil", "soy"], ["대두단백", "soy protein", "soy"], ["분리대두단백", "soy protein isolate", "soy"],
+    ["대두레시틴", "soy lecithin", "soy"], ["두유", "soy milk", "soy"], ["두부", "tofu", "soy"], ["콩가루", "soybean powder", "soy"], ["탈지대두", "defatted soybean", "soy"], ["콩", "bean / soybean", "soy"],
+    // milk
+    ["우유", "milk", "milk"], ["전지분유", "whole milk powder", "milk"], ["탈지분유", "skim milk powder", "milk"], ["혼합분유", "mixed milk powder", "milk"], ["분유", "milk powder", "milk"],
+    ["유청", "whey", "milk"], ["유청분말", "whey powder", "milk"], ["유청단백", "whey protein", "milk"], ["유당", "lactose", "milk"], ["락토스", "lactose", "milk"],
+    ["카제인", "casein", "milk"], ["카제인나트륨", "sodium caseinate", "milk"], ["버터", "butter", "milk"], ["버터밀크", "buttermilk", "milk"], ["치즈", "cheese", "milk"],
+    ["생크림", "fresh cream", "milk"], ["유크림", "dairy cream", "milk"], ["연유", "condensed milk", "milk"], ["요구르트", "yogurt", "milk"], ["요거트", "yogurt", "milk"],
+    ["밀크", "milk", "milk"], ["크림", "cream (may be dairy)", "maybeMilk"], ["크리머", "creamer (may be dairy)", "maybeMilk"],
+    ["카카오버터", "cocoa butter (plant)", ""], ["코코아버터", "cocoa butter (plant)", ""], ["시어버터", "shea butter (plant)", ""], ["식물성크림", "non-dairy cream", ""],
+    ["코코넛밀크", "coconut milk (plant)", ""], ["밀크씨슬", "milk thistle (plant)", ""],
+    // egg
+    ["계란", "egg", "egg"], ["달걀", "egg", "egg"], ["전란", "whole egg", "egg"], ["전란액", "liquid whole egg", "egg"], ["난백", "egg white", "egg"], ["난황", "egg yolk", "egg"],
+    ["난백분말", "egg white powder", "egg"], ["난황분말", "egg yolk powder", "egg"], ["계란분말", "egg powder", "egg"], ["알류", "eggs (poultry)", "egg"], ["난류", "eggs", "egg"], ["마요네즈", "mayonnaise (usually egg)", "maybeEgg"],
+    // nuts, fruit
+    ["땅콩", "peanut", "peanut"], ["땅콩버터", "peanut butter", "peanut"], ["피넛", "peanut", "peanut"], ["피넛버터", "peanut butter", "peanut"], ["메밀", "buckwheat", "buckwheat"],
+    ["호두", "walnut", "walnut"], ["잣", "pine nut", "pinenut"], ["복숭아", "peach", "peach"], ["토마토", "tomato", "tomato"], ["토마토페이스트", "tomato paste", "tomato"],
+    // sulfites
+    ["아황산", "sulfite", "sulfite"], ["아황산나트륨", "sodium sulfite", "sulfite"], ["메타중아황산나트륨", "sodium metabisulfite", "sulfite"], ["메타중아황산칼륨", "potassium metabisulfite", "sulfite"],
+    ["무수아황산", "sulfur dioxide", "sulfite"], ["차아황산나트륨", "sodium hydrosulfite", "sulfite"], ["산성아황산나트륨", "sodium bisulfite", "sulfite"],
+    // seafood
+    ["고등어", "mackerel", "mackerel fish"], ["게", "crab", "crab seafood"], ["게살", "crab meat", "crab seafood"], ["꽃게", "blue crab", "crab seafood"], ["홍게", "red snow crab", "crab seafood"], ["대게", "snow crab", "crab seafood"], ["크랩", "crab", "crab seafood"],
+    ["새우", "shrimp", "shrimp seafood"], ["새우분말", "shrimp powder", "shrimp seafood"], ["새우젓", "salted shrimp", "shrimp seafood"], ["쉬림프", "shrimp", "shrimp seafood"],
+    ["오징어", "squid", "squid seafood"], ["조개", "clam", "shellfish seafood"], ["조개류", "shellfish", "shellfish seafood"], ["굴", "oyster", "shellfish seafood"], ["굴소스", "oyster sauce", "shellfish seafood"],
+    ["전복", "abalone", "shellfish seafood"], ["홍합", "mussel", "shellfish seafood"], ["바지락", "short-neck clam", "shellfish seafood"], ["가리비", "scallop", "shellfish seafood"],
+    ["멸치", "anchovy", "fish"], ["멸치엑기스", "anchovy extract", "fish"], ["가다랑어", "bonito", "fish"], ["참치", "tuna", "fish"], ["어묵", "fish cake", "fish"], ["어간장", "fish sauce", "fish"],
+    ["액젓", "fish sauce", "fish"], ["피쉬소스", "fish sauce", "fish"], ["연어", "salmon", "fish"], ["명태", "pollock", "fish"], ["다시마", "kelp (plant)", ""],
+    // meat
+    ["돼지고기", "pork", "pork meat"], ["돈육", "pork", "pork meat"], ["돈지", "lard (pork fat)", "pork meat"], ["라드", "lard (pork fat)", "pork meat"], ["돼지기름", "pork fat", "pork meat"],
+    ["돼지뼈", "pork bone", "pork meat"], ["돈골", "pork bone", "pork meat"], ["베이컨", "bacon", "pork meat"], ["햄", "ham", "pork meat"], ["포크", "pork", "pork meat"],
+    ["돼지젤라틴", "pork gelatin", "pork meat gelatin"], ["돼지", "pork", "pork meat"], ["소시지", "sausage (often pork)", "meat meatOther"],
+    ["쇠고기", "beef", "beef meat"], ["소고기", "beef", "beef meat"], ["우육", "beef", "beef meat"], ["우지", "beef tallow", "beef meat"], ["사골", "beef bone broth", "beef meat"],
+    ["우골", "beef bone", "beef meat"], ["비프", "beef", "beef meat"], ["쇠고기추출물", "beef extract", "beef meat"], ["소젤라틴", "beef gelatin", "beef meat gelatin"],
+    ["닭고기", "chicken", "chicken meat"], ["계육", "chicken", "chicken meat"], ["치킨", "chicken", "chicken meat"], ["닭뼈", "chicken bone", "chicken meat"], ["계골", "chicken bone", "chicken meat"], ["닭가슴살", "chicken breast", "chicken meat"],
+    ["젤라틴", "gelatin", "gelatin"],
+    // alcohol
+    ["주정", "ethanol (alcohol)", "alcohol"], ["발효주정", "fermented ethanol", "alcohol"], ["알코올", "alcohol", "alcohol"], ["알콜", "alcohol", "alcohol"], ["에탄올", "ethanol", "alcohol"],
+    ["청주", "rice wine", "alcohol"], ["맛술", "cooking wine", "alcohol"], ["미림", "mirin (rice wine)", "alcohol"], ["와인", "wine", "alcohol"], ["포도주", "wine", "alcohol"],
+    ["럼", "rum", "alcohol"], ["브랜디", "brandy", "alcohol"], ["소주", "soju", "alcohol"], ["맥주", "beer", "alcohol barley"], ["정종", "rice wine", "alcohol"],
+    // other animal
+    ["벌꿀", "honey", "honey"], ["꿀", "honey", "honey"], ["로열젤리", "royal jelly", "honey"], ["프로폴리스", "propolis", "honey"],
+    ["코치닐", "cochineal (insect)", "insect"], ["코치닐추출색소", "cochineal color (insect)", "insect"], ["카민", "carmine (insect)", "insect"], ["셸락", "shellac (insect)", "insect"], ["쉘락", "shellac (insect)", "insect"]
+  ].map(function (d) { return { ko: d[0], en: d[1], tags: d[2] ? d[2].split(" ") : [] }; });
+  // Longest first so 땅콩버터 wins over 버터, and one-syllable words only count as a whole item
+  DICT.sort(function (a, b) { return b.ko.length - a.ko.length; });
+
+  // ================= Samples =================
+  var SAMPLES = [
+    "원재료명: 소맥분(밀:미국산), 백설탕, 물엿, 쇼트닝, 코코아분말, 전지분유, 젤라틴(돼지), 계란, 카카오버터, 유청분말(우유), 정제소금, 합성향료(바닐린), 대두레시틴\n알레르기 유발물질: 밀, 우유, 돼지고기, 계란, 대두 함유\n이 제품은 땅콩, 메밀, 토마토를 사용한 제품과 같은 제조시설에서 제조하고 있습니다.",
+    "[면] 소맥분(밀:호주산), 감자전분, 팜유, 정제염, 면류첨가알칼리제\n[스프] 정제염, 쇠고기추출물, 간장분말(대두, 밀), 고춧가루, 마늘, 새우분말, 멸치엑기스, 표고버섯, 발효주정\n밀, 대두, 쇠고기, 새우 함유\n이 제품은 우유, 계란, 돼지고기, 닭고기, 고등어, 게, 오징어, 조개류를 사용한 제품과 같은 제조시설에서 제조하고 있습니다.",
+    "정제수, 복숭아농축과즙(복숭아:국산), 과당, 구연산, 비타민C, 천연향료\n복숭아 함유"
+  ];
+
+  // ================= State =================
+  var KEY = "labellens.prefs.v1";
+  var prefs = { diets: ["halal"], allergies: ["peanut"] }; // shown as an example on first visit
+  var exampleMode = true;
+  try { var raw = localStorage.getItem(KEY); if (raw) { prefs = JSON.parse(raw); exampleMode = false; } } catch (e) {}
+  function savePrefs() { exampleMode = false; try { localStorage.setItem(KEY, JSON.stringify(prefs)); } catch (e) {} }
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  // ================= Chips =================
+  function renderChips() {
+    $("dietChips").innerHTML = DIETS.map(function (d) { return chip("diet", d.id, d.en, d.ko, prefs.diets.indexOf(d.id) !== -1); }).join("");
+    $("allergyChips").innerHTML = ALLERGENS.map(function (a) { return chip("allergy", a[0], a[1], a[2], prefs.allergies.indexOf(a[0]) !== -1); }).join("");
+  }
+  function chip(kind, id, en, ko, on) { return '<button type="button" class="chip" data-kind="' + kind + '" data-id="' + id + '" aria-pressed="' + on + '">' + esc(en) + ' <span class="k">' + esc(ko) + "</span></button>"; }
+  document.addEventListener("click", function (e) {
+    var c = e.target.closest(".chip"); if (!c) return;
+    var list = c.getAttribute("data-kind") === "diet" ? prefs.diets : prefs.allergies, id = c.getAttribute("data-id"), i = list.indexOf(id);
+    if (i === -1) list.push(id); else list.splice(i, 1);
+    savePrefs(); renderChips(); analyze();
+  });
+
+  // ================= Matching =================
+  var DELIM = /[,，、()\[\]{}·:;\/\n。.]/;
+  function analyze() {
+    var text = $("text").value;
+    // compact text without spaces, keeping a map back to the original positions
+    var compact = "", map = [];
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i];
+      if (/[ \t\u00a0\u3000\r]/.test(ch)) continue;
+      // a line break inside a word (젤\n라틴) is joined; a break after a comma stays a separator
+      if (ch === "\n" && /[가-힣]/.test(compact.slice(-1)) && /^[ \t]*[가-힣]/.test(text.slice(i + 1))) continue;
+      compact += ch; map.push(i);
+    }
+
+    // "같은 제조시설" sentence = may contain (shared facility), not an ingredient
+    var facStart = -1, facEnd = -1, m = compact.search(/(같은|동일한|동일)(제조)?시설/);
+    if (m !== -1) {
+      var s1 = compact.lastIndexOf("이제품은", m), s2 = Math.max(compact.lastIndexOf("\n", m), compact.lastIndexOf(".", m));
+      facStart = s1 !== -1 && s1 > s2 ? s1 : s2 + 1; facEnd = m;
+    }
+    var covered = new Array(compact.length).fill(false), hits = [];
+    DICT.forEach(function (d) {
+      var from = 0, idx;
+      while ((idx = compact.indexOf(d.ko, from)) !== -1) {
+        from = idx + 1;
+        var end = idx + d.ko.length, free = true;
+        for (var k = idx; k < end; k++) if (covered[k]) { free = false; break; }
+        if (!free) continue;
+        if (d.ko.length === 1 && !wholeItem(compact, idx, end)) continue;
+        for (k = idx; k < end; k++) covered[k] = true;
+        hits.push({ d: d, start: idx, end: end, facility: facStart !== -1 && idx >= facStart && idx < facEnd });
+      }
+    });
+    hits.sort(function (a, b) { return a.start - b.start; });
+    render(text, compact, map, hits, facStart, facEnd);
+  }
+  // one-syllable words (밀, 게, 굴, 잣, 햄, 꿀, 콩, 럼) count only as their own list item, e.g. "밀, 대두 함유"
+  function wholeItem(c, s, e) {
+    var before = s === 0 || DELIM.test(c[s - 1]);
+    var rest = c.slice(e), after = rest === "" || DELIM.test(rest[0]) || /^(함유|등)/.test(rest);
+    return before && after;
+  }
+
+  function evaluate(hits) {
+    var reasons = [], byKey = {};
+    function add(level, title, why, ko) {
+      var key = level + title + why; if (byKey[key]) { if (byKey[key].kos.indexOf(ko) === -1) byKey[key].kos.push(ko); return; }
+      byKey[key] = { level: level, title: title, why: why, kos: [ko] }; reasons.push(byKey[key]);
+    }
+    hits.forEach(function (h) {
+      var tags = h.d.tags;
+      prefs.allergies.forEach(function (a) {
+        var al = ALLERGENS.find(function (x) { return x[0] === a; });
+        if (tags.indexOf(a) !== -1) {
+          if (h.facility) add("warn", al[1] + " may be present", "Made in a facility that also handles " + al[1].toLowerCase() + " (cross-contact).", h.d.ko);
+          else add("bad", "Contains " + al[1].toLowerCase(), "You marked " + al[1].toLowerCase() + " as an allergy.", h.d.ko);
+        }
+        if (a === "wheat" && tags.indexOf("maybeWheat") !== -1 && !h.facility) add("warn", "May contain wheat", h.d.en + ". Check the allergy line.", h.d.ko);
+        if (a === "milk" && tags.indexOf("maybeMilk") !== -1 && !h.facility) add("warn", "May contain milk", h.d.en + ".", h.d.ko);
+        if (a === "egg" && tags.indexOf("maybeEgg") !== -1 && !h.facility) add("warn", "May contain egg", h.d.en + ".", h.d.ko);
+      });
+      if (h.facility) return; // shared-facility notes don't break diets
+      prefs.diets.forEach(function (id) {
+        var dt = DIETS.find(function (x) { return x.id === id; });
+        dt.no.forEach(function (t) { if (tags.indexOf(t) !== -1) add("bad", "Not " + dt.en.toLowerCase(), "Contains " + TAG_EN[t] + ".", h.d.ko); });
+        dt.check.forEach(function (t) { if (tags.indexOf(t) !== -1 && !dt.no.some(function (n) { return tags.indexOf(n) !== -1; })) add("warn", "Check for " + dt.en.toLowerCase(), "Contains " + TAG_EN[t] + ".", h.d.ko); });
+      });
+    });
+    reasons.sort(function (a, b) { return (a.level === "bad" ? 0 : 1) - (b.level === "bad" ? 0 : 1); });
+    return reasons;
+  }
+
+  function render(text, compact, map, hits, facStart, facEnd) {
+    var v = $("verdict"), reasons = evaluate(hits), none = !prefs.diets.length && !prefs.allergies.length;
+    var bad = reasons.some(function (r) { return r.level === "bad"; }), warn = reasons.length > 0;
+    var ex = exampleMode ? '<span class="example-note">Example settings: Halal + peanut allergy. Change them in Step 1.</span>' : "";
+    if (!text.trim()) { v.className = "verdict idle"; v.innerHTML = '<div class="head">Waiting for a label</div><p>Add a photo or try a sample to see the result here.</p>'; }
+    else if (none) { v.className = "verdict idle"; v.innerHTML = '<div class="head">Pick what you avoid</div><p>Choose a diet or allergy in Step 1 and LabelLens will check this label against it.</p>'; }
+    else if (!hits.length) { v.className = "verdict warn"; v.innerHTML = '<div class="head">Couldn\'t spot any ingredients</div><div class="ko">아는 성분을 찾지 못했어요</div><p>We can\'t say this is safe. Check that the text matches the label, or try a sharper photo.</p>'; }
+    else if (bad) { v.className = "verdict bad"; v.innerHTML = '<div class="head">Not for you</div><div class="ko">먹을 수 없어요</div><p>This product has ingredients that break your rules.</p>' + ex; }
+    else if (warn) { v.className = "verdict warn"; v.innerHTML = '<div class="head">Check before eating</div><div class="ko">확인이 필요해요</div><p>Nothing clearly breaks your rules, but some items need a closer look.</p>' + ex; }
+    else { v.className = "verdict ok"; v.innerHTML = '<div class="head">No problems found</div><div class="ko">문제 성분을 찾지 못했어요</div><p>None of the ingredients we recognized break your rules. Unclear print may hide words, so glance at the label too.</p>' + ex; }
+
+    $("reasonPanel").hidden = !reasons.length;
+    $("reasons").innerHTML = reasons.map(function (r) {
+      return '<li class="reason ' + r.level + '"><span class="dot" aria-hidden="true"></span><div><div class="what">' + esc(r.title) + " " + r.kos.map(function (k) { return '<span class="kterm" lang="ko">' + esc(k) + "</span>"; }).join(" ") + '</div><div class="why">' + esc(r.why) + "</div></div></li>";
+    }).join("");
+
+    // ingredient table (unique, in label order)
+    var seen = {}, rows = [];
+    var active = activeTags();
+    hits.forEach(function (h) {
+      var key = h.d.ko + (h.facility ? "@f" : ""); if (seen[key]) return; seen[key] = 1;
+      var tags = h.d.tags.map(function (t) {
+        var al = ALLERGENS.find(function (x) { return x[0] === t; });
+        var name = al ? al[1].toLowerCase() : (TAG_EN[t] || t);
+        var c = active.no.indexOf(t) !== -1 ? (h.facility ? " chk" : " hit") : active.check.indexOf(t) !== -1 ? " chk" : "";
+        return '<span class="tag' + c + '">' + esc(name) + "</span>";
+      }).join("");
+      if (h.facility) tags = '<span class="tag chk">shared facility only</span>' + tags;
+      if (!h.d.tags.length) tags = '<span class="tag">plant-based</span>';
+      rows.push('<tr><td lang="ko"><b>' + esc(h.d.ko) + "</b></td><td>" + esc(h.d.en) + "</td><td>" + tags + "</td></tr>");
+    });
+    $("ingTable").innerHTML = rows.length ? rows.join("") : '<tr><td colspan="3" style="color:var(--muted)">' + (text.trim() ? "No known ingredients found yet. If the photo was blurry, fix the text on the left." : "Nothing yet.") + "</td></tr>";
+
+    // highlighted original text
+    var marks = hits.map(function (h) { return { s: map[h.start], e: map[h.end - 1] + 1, x: isActiveHit(h, active), f: h.facility }; });
+    var out = "", pos = 0;
+    marks.forEach(function (mk) { out += esc(text.slice(pos, mk.s)) + '<mark class="' + (mk.x ? "x" : "") + '">' + esc(text.slice(mk.s, mk.e)) + "</mark>"; pos = mk.e; });
+    out += esc(text.slice(pos));
+    $("marked").innerHTML = out || '<span style="color:var(--muted)">No text yet.</span>';
+  }
+  function activeTags() {
+    var no = prefs.allergies.slice(), check = [];
+    prefs.allergies.forEach(function (a) { if (a === "wheat") check.push("maybeWheat"); if (a === "milk") check.push("maybeMilk"); if (a === "egg") check.push("maybeEgg"); });
+    prefs.diets.forEach(function (id) { var d = DIETS.find(function (x) { return x.id === id; }); no = no.concat(d.no); check = check.concat(d.check); });
+    return { no: no, check: check };
+  }
+  function isActiveHit(h, act) { return h.d.tags.some(function (t) { return act.no.indexOf(t) !== -1; }); }
+
+  // ================= Photo → text (runs in the browser) =================
+  var workerP = null;
+  function setOcr(msg, p) { $("ocrMsg").textContent = msg; if (p != null) $("ocrBar").style.width = Math.round(p * 100) + "%"; }
+  function getWorker() {
+    if (!workerP) {
+      if (typeof Tesseract === "undefined") return Promise.reject(new Error("no-lib"));
+      workerP = Tesseract.createWorker("kor", 1, Object.assign({
+        logger: function (m) {
+          if (m.status === "recognizing text") setOcr("Reading Korean text… " + Math.round(m.progress * 100) + "%", 0.3 + m.progress * 0.7);
+          else if (/loading|initializ/.test(m.status)) setOcr("Getting the Korean reader ready (first time only)…", 0.05 + (m.progress || 0) * 0.25);
+        }
+      }, window.LABELLENS_OCR || {})).catch(function (e) { workerP = null; throw e; });
+    }
+    return workerP;
+  }
+  function prepImage(img) {
+    // Make print easier to read: upscale small photos, flatten uneven lighting
+    // (divide by a blurred copy of the photo), then stretch contrast.
+    var w = img.naturalWidth, h = img.naturalHeight, scale = Math.min(2.5, Math.max(1, 1800 / w));
+    var cv = document.createElement("canvas"), W = cv.width = Math.round(w * scale), H = cv.height = Math.round(h * scale);
+    var ctx = cv.getContext("2d"); ctx.imageSmoothingQuality = "high"; ctx.drawImage(img, 0, 0, W, H);
+    var data = ctx.getImageData(0, 0, W, H), px = data.data, n = W * H, g = new Float32Array(n), i, x, y;
+    for (i = 0; i < n; i++) g[i] = px[i * 4] * 0.299 + px[i * 4 + 1] * 0.587 + px[i * 4 + 2] * 0.114;
+    var I = new Float64Array((W + 1) * (H + 1));
+    for (y = 0; y < H; y++) { var row = 0; for (x = 0; x < W; x++) { row += g[y * W + x]; I[(y + 1) * (W + 1) + x + 1] = I[y * (W + 1) + x + 1] + row; } }
+    var r = Math.round(Math.max(12, W / 70)), out = new Float32Array(n), hist = new Uint32Array(256);
+    for (y = 0; y < H; y++) {
+      var y0 = Math.max(0, y - r), y1 = Math.min(H, y + r + 1);
+      for (x = 0; x < W; x++) {
+        var x0 = Math.max(0, x - r), x1 = Math.min(W, x + r + 1);
+        var sum = I[y1 * (W + 1) + x1] - I[y0 * (W + 1) + x1] - I[y1 * (W + 1) + x0] + I[y0 * (W + 1) + x0];
+        var v = Math.min(255, g[y * W + x] / (sum / ((x1 - x0) * (y1 - y0)) + 1) * 255);
+        out[y * W + x] = v; hist[v | 0]++;
+      }
+    }
+    var cut = n * 0.01, lo = 0, hi = 255, acc = 0;
+    for (acc = 0, lo = 0; lo < 255 && acc + hist[lo] < cut; lo++) acc += hist[lo];
+    for (acc = 0, hi = 255; hi > 0 && acc + hist[hi] < cut; hi--) acc += hist[hi];
+    var span = Math.max(1, hi - lo);
+    for (i = 0; i < n; i++) { var c = Math.max(0, Math.min(255, (out[i] - lo) * 255 / span)); px[i * 4] = px[i * 4 + 1] = px[i * 4 + 2] = c; }
+    ctx.putImageData(data, 0, 0);
+    return cv;
+  }
+  function handleFile(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    var url = URL.createObjectURL(file), img = new Image();
+    $("preview").hidden = false; $("previewImg").src = url; setOcr("Opening photo…", 0.02);
+    img.onload = function () {
+      var canvas = prepImage(img);
+      getWorker().then(function (w) { return w.recognize(canvas); }).then(function (r) {
+        var t = r.data.text.replace(/[ \t]+\n/g, "\n").trim(), hangul = (t.match(/[가-힣]/g) || []).length;
+        $("text").value = hangul >= 8 ? t : "";
+        setOcr(hangul >= 8 ? "Done. Check the text below and fix any misread words." : "Couldn't read Korean text in this photo. Move closer to the 원재료명 box, keep it flat and well lit, and try again.", hangul >= 8 ? 1 : 0);
+        analyze();
+      }).catch(function () {
+        setOcr("Text recognition couldn't start here (it needs an internet connection the first time). You can type or paste the ingredients below instead.", 0);
+      });
+    };
+    img.src = url;
+  }
+  $("pickBtn").addEventListener("click", function () { $("file").click(); });
+  $("file").addEventListener("change", function () { handleFile(this.files[0]); this.value = ""; });
+  var drop = $("drop");
+  ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function (e) { handleFile(e.dataTransfer.files[0]); });
+  document.addEventListener("paste", function (e) {
+    var items = (e.clipboardData || {}).items || [];
+    for (var i = 0; i < items.length; i++) if (items[i].type.indexOf("image") === 0) { handleFile(items[i].getAsFile()); e.preventDefault(); return; }
+  });
+
+  document.querySelectorAll("[data-sample]").forEach(function (b) {
+    b.addEventListener("click", function () { $("text").value = SAMPLES[Number(b.getAttribute("data-sample"))]; $("preview").hidden = true; analyze(); });
+  });
+  $("text").addEventListener("input", analyze);
+
+  // ================= Start =================
+  renderChips();
+  $("text").value = SAMPLES[0];
+  analyze();
+})();
+</script>
