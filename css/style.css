@@ -141,6 +141,31 @@ body { word-break: keep-all; overflow-wrap: anywhere; }
   background: var(--bg);
 }
 .drop p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }   /* 사진을 끌어다 올렸을 때 */
+.drop-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+/* 앱 안 카메라 */
+.camera { display: flex; flex-direction: column; gap: 10px; }
+.cam-view { position: relative; border-radius: 10px; overflow: hidden; background: #000; }
+.cam-view video { display: block; width: 100%; height: auto; }
+.guide {
+  position: absolute; left: 7%; right: 7%; top: 25%; bottom: 25%;
+  border: 3px solid #FFFFFF; border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);    /* 틀 바깥을 어둡게 */
+  display: flex; align-items: flex-start; justify-content: center;
+}
+.guide span { margin-top: -30px; color: #FFFFFF; font-size: 13px; font-weight: 700; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+.cam-ctrls { display: flex; gap: 8px; flex-wrap: wrap; }
+.cam-ctrls .big { flex: 1 1 200px; padding: 12px; font-size: 16px; }
+
+/* 인식 진행 상황 */
+.preview { display: flex; gap: 12px; align-items: center; }
+.preview img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); flex: none; }
+.ocr-status { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+.notice { margin: 0; font-size: 13.5px; background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 8px 12px; }
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
 
 /* 예시 라벨 버튼 */
 .samples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
@@ -156,6 +181,7 @@ button.btn {
 }
 button.btn:hover { border-color: var(--accent); }
 button.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; padding: 8px 14px; }
 
 /* 글자 입력칸 */
 label.tl { font-size: 13px; font-weight: 700; color: var(--muted); }
