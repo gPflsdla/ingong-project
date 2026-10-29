@@ -1,6 +1,7 @@
 // =========================================================
 // LabelLens Korea 화면 연결
 // 2단계: 식단·알레르기 선택 버튼과 저장 (PRD #4-1)
+// 3단계: 글자 입력, 예시 라벨, 판정 표시 (PRD #4-3, #4-4)
 // =========================================================
 (function () {
   "use strict";
@@ -50,8 +51,57 @@
     if (i === -1) list.push(id); else list.splice(i, 1);
     savePrefs();
     renderChips();
+    analyze();
+  });
+
+  // ---------- 판정 문구 ----------
+  var TAG_EN = {
+    meat: "meat", fish: "fish", seafood: "seafood", milk: "dairy", egg: "egg", honey: "honey",
+    gelatin: "gelatin (source often unknown)", insect: "insect-derived color", pork: "pork", alcohol: "alcohol",
+    beef: "beef (slaughter method unknown)", chicken: "chicken (slaughter method unknown)", meatOther: "meat (slaughter method unknown)",
+    wheat: "wheat", barley: "barley", rye: "rye", oat: "oats (often mixed with wheat)",
+    maybeMilk: "something that may be dairy", maybeEgg: "something that may contain egg", maybeWheat: "something that usually contains wheat"
+  };
+  function reasonText(r) {
+    var target = r.kind === "diet" ? byId(LL.DIETS, r.target).en : byId(LL.ALLERGENS, r.target).en;
+    var what = r.level === "bad"
+      ? (r.kind === "diet" ? "Not " + target.toLowerCase() : "Contains " + target.toLowerCase())
+      : (r.kind === "diet" ? "Check for " + target.toLowerCase() : "May contain " + target.toLowerCase());
+    var why = r.kind === "diet" ? ": contains " + (TAG_EN[r.tag] || r.tag) : "";
+    return what + why + " (" + r.terms.join(", ") + ")";
+  }
+  function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+
+  // ---------- 글자가 바뀔 때마다 판정 ----------
+  function analyze() {
+    var text = $("text").value, box = $("verdict");
+    var hits = LL.findIngredients(text), reasons = LL.evaluate(hits, prefs), v = LL.verdict(hits, reasons, prefs);
+    if (!text.trim()) { v = "empty"; }
+    var head = {
+      empty: ["idle", "Waiting for a label", "Type or paste the ingredients, or try a sample."],
+      none: ["idle", "Pick what you avoid", "Choose a diet or allergy in Step 1 to check this label."],
+      bad: ["bad", "Not for you", "This product has ingredients that break your rules."],
+      warn: ["warn", "Check before eating", "Nothing clearly breaks your rules, but some items need a closer look."],
+      ok: ["ok", "No problems found", "None of the ingredients we recognized break your rules."]
+    }[v];
+    box.className = "verdict " + head[0];
+    box.innerHTML = '<div class="head">' + esc(head[1]) + "</div><p>" + esc(head[2]) + "</p>" +
+      (reasons.length && v !== "empty" ? "<ul>" + reasons.map(function (r) { return "<li>" + esc(reasonText(r)) + "</li>"; }).join("") + "</ul>" : "");
+  }
+  $("text").addEventListener("input", analyze);
+
+  // ---------- 예시 라벨 버튼 ----------
+  $("samples").insertAdjacentHTML("beforeend", LL.SAMPLES.map(function (s, i) {
+    return '<button type="button" class="btn" data-sample="' + i + '">' + esc(s.en) + "</button>";
+  }).join(""));
+  $("samples").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-sample]");
+    if (!b) return;
+    $("text").value = LL.SAMPLES[Number(b.getAttribute("data-sample"))].text;
+    analyze();
   });
 
   renderChips();
+  analyze();
   document.documentElement.setAttribute("data-app", "ready");
 })();

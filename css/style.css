@@ -142,6 +142,21 @@ body { word-break: keep-all; overflow-wrap: anywhere; }
 }
 .drop p { margin: 0; font-size: 13.5px; color: var(--muted); }
 
+/* 예시 라벨 버튼 */
+.samples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+button.btn {
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+button.btn:hover { border-color: var(--accent); }
+button.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* 글자 입력칸 */
 label.tl { font-size: 13px; font-weight: 700; color: var(--muted); }
 textarea {
@@ -170,5 +185,6 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-c
 .verdict.warn .head { color: var(--warn); }
 .verdict.ok .head { color: var(--ok); }
 .verdict p { margin: 0; font-size: 14px; }
+.verdict ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px; }   /* 3단계 임시 이유 목록 (5단계에서 Why 칸으로 옮김) */
 
 footer { font-size: 12.5px; color: var(--muted); max-width: 80ch; }
