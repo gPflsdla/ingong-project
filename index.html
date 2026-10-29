@@ -21,18 +21,20 @@
     <!-- 2단 배치: 왼쪽 입력, 오른쪽 결과. 휴대폰에서는 한 줄로 쌓임 (PRD #3, #7) -->
     <main class="grid">
       <div class="col">
-        <!-- Step 1: 내 제한 고르기. 선택 버튼은 2단계에서 추가 -->
+        <!-- Step 1: 내 제한 고르기 (PRD #4-1). 버튼은 js/app.js가 js/restrictions.js 목록으로 그림 -->
         <section class="panel" aria-labelledby="h-rules">
           <span class="step">Step 1</span>
           <h2 id="h-rules">What do you avoid?</h2>
           <div class="chipset">
             <span class="lbl">Diet</span>
-            <div class="chips" id="dietChips"><span class="placeholder">Diet options will appear here.</span></div>
+            <div class="chips" id="dietChips"></div>
           </div>
           <div class="chipset">
             <span class="lbl">Allergies (Korean labeling list)</span>
-            <div class="chips" id="allergyChips"><span class="placeholder">Allergy options will appear here.</span></div>
+            <div class="chips" id="allergyChips"></div>
           </div>
+          <p class="summary" id="ruleSummary"></p>
+          <p class="hint">Your choices are saved in this browser only.</p>
         </section>
 
         <!-- Step 2: 라벨 넣기. 사진·카메라는 4단계, 글자 입력과 예시는 3단계에서 추가 -->
@@ -66,6 +68,7 @@
 
     <footer>LabelLens matches Korean ingredient names against a built-in dictionary. Always read the label yourself or ask staff when an allergy is serious. Photos never leave your device.</footer>
   </div>
+  <script src="js/restrictions.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
