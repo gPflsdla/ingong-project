@@ -23,7 +23,9 @@ window.LL = window.LL || {};
       why: "Why", ingredients: "Ingredients we recognized", showMarked: "Show the label text with highlights",
       colKo: "On the label", colEn: "English", colNotes: "Notes",
       noIngredients: "No known ingredients found. If the photo was blurry, fix the text on the left.", nothingYet: "Nothing yet.",
-      plantBased: "plant-based", facilityOnly: "shared facility only",
+      plantBased: "plant-based", facilityOnly: "shared facility only", noConcern: "no concern",
+      countLine: "{known} of {total} ingredients recognized",
+      unknownItems: "Not in our list (check the label or fix misread words):",
       footer: "LabelLens matches Korean ingredient names against a built-in dictionary. Text recognition can misread small or blurry print, and some ingredients (flavorings, emulsifiers) do not reveal their source. Always read the label yourself or ask staff when an allergy is serious. Photos never leave your device.",
       // 판정
       v_empty: "Waiting for a label", v_empty_p: "Add a photo, open the camera, or try a sample.",
@@ -64,7 +66,9 @@ window.LL = window.LL || {};
       why: "이유", ingredients: "찾은 성분", showMarked: "라벨 원문에서 찾은 성분 보기",
       colKo: "라벨 표기", colEn: "영어", colNotes: "분류",
       noIngredients: "아는 성분을 찾지 못했어요. 사진이 흐렸다면 왼쪽 글자를 고쳐 주세요.", nothingYet: "아직 없어요.",
-      plantBased: "식물성", facilityOnly: "같은 제조시설만",
+      plantBased: "식물성", facilityOnly: "같은 제조시설만", noConcern: "해당 없음",
+      countLine: "원재료 {total}개 중 {known}개 인식",
+      unknownItems: "사전에 없는 원재료 (라벨을 확인하거나 잘못 읽힌 글자를 고쳐 주세요):",
       footer: "LabelLens는 앱에 들어 있는 성분 사전으로 한국어 원재료명을 판정해요. 작거나 흐린 글자는 잘못 읽힐 수 있고, 향료나 유화제처럼 원료를 알 수 없는 성분도 있어요. 알레르기가 심하다면 꼭 라벨을 직접 확인하거나 직원에게 물어보세요. 사진은 기기 밖으로 나가지 않아요.",
       v_empty: "라벨을 기다리는 중", v_empty_p: "사진을 넣거나, 카메라를 켜거나, 예시 라벨을 눌러 보세요.",
       v_none: "피하는 것을 골라 주세요", v_none_p: "1단계에서 식단이나 알레르기를 고르면 이 라벨을 확인해요.",
@@ -96,11 +100,11 @@ window.LL = window.LL || {};
     en: { meat: "meat", fish: "fish", seafood: "seafood", milk: "dairy", egg: "egg", honey: "honey", gelatin: "gelatin (source often unknown)",
       insect: "insect-derived color", pork: "pork", alcohol: "alcohol", beef: "beef (slaughter method unknown)", chicken: "chicken (slaughter method unknown)",
       meatOther: "meat (slaughter method unknown)", wheat: "wheat", barley: "barley", rye: "rye", oat: "oats (often mixed with wheat)",
-      maybeMilk: "may be dairy", maybeEgg: "may contain egg", maybeWheat: "usually contains wheat" },
+      maybeMilk: "may be dairy", maybeEgg: "may contain egg", maybeWheat: "usually contains wheat", maybeSoy: "usually made from soy" },
     ko: { meat: "고기", fish: "생선", seafood: "해산물", milk: "유제품", egg: "계란", honey: "꿀", gelatin: "젤라틴(원료를 알 수 없음)",
       insect: "곤충 유래 색소", pork: "돼지고기", alcohol: "알코올", beef: "쇠고기(도축 방식 모름)", chicken: "닭고기(도축 방식 모름)",
       meatOther: "고기(도축 방식 모름)", wheat: "밀", barley: "보리", rye: "호밀", oat: "귀리(밀이 섞이기 쉬움)",
-      maybeMilk: "유제품일 수 있음", maybeEgg: "계란이 들었을 수 있음", maybeWheat: "대개 밀이 들어감" }
+      maybeMilk: "유제품일 수 있음", maybeEgg: "계란이 들었을 수 있음", maybeWheat: "대개 밀이 들어감", maybeSoy: "대개 대두로 만듦" }
   };
 
   var KEY = "labellens.lang.v1";

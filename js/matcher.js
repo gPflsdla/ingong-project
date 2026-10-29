@@ -85,7 +85,7 @@ window.LL = window.LL || {};
       // 알레르기: 태그가 있으면 먹을 수 없음, "~일 수 있음" 태그면 확인 필요
       prefs.allergies.forEach(function (a) {
         if (tags.indexOf(a) !== -1) add("bad", "allergy", a, a, h.entry.ko);
-        var maybe = { wheat: "maybeWheat", milk: "maybeMilk", egg: "maybeEgg" }[a];
+        var maybe = { wheat: "maybeWheat", milk: "maybeMilk", egg: "maybeEgg", soy: "maybeSoy" }[a];
         if (maybe && tags.indexOf(maybe) !== -1) add("warn", "allergy", a, maybe, h.entry.ko);
       });
       // 식단: no 태그면 먹을 수 없음, check 태그면 확인 필요 (no에 이미 걸린 성분은 제외)
@@ -98,6 +98,27 @@ window.LL = window.LL || {};
     });
     reasons.sort(function (a, b) { return (a.level === "bad" ? 0 : 1) - (b.level === "bad" ? 0 : 1); });
     return reasons;
+  };
+
+  // 원재료가 몇 개이고 그중 몇 개를 사전에서 알아봤는지 셈 (6-2)
+  // 알레르기 표시 줄과 같은 제조시설 문장은 원재료가 아니라서 세지 않음
+  LL.countItems = function (text) {
+    var items = [];
+    (text || "").split(/\n/).forEach(function (line) {
+      if (/함유|알레르기|(같은|동일한|동일)\s*(제조)?\s*시설/.test(line)) return;
+      line = line.replace(/^\s*(원재료명?|원재료\s*및\s*함량)\s*[:：]?/, "").replace(/\[[^\]]*\]/g, ",");
+      var depth = 0, cur = "";
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (ch === "(" || ch === "（") depth++;
+        if (ch === ")" || ch === "）") depth = Math.max(0, depth - 1);
+        if ((ch === "," || ch === "，" || ch === "、") && depth === 0) { items.push(cur); cur = ""; } else cur += ch;
+      }
+      items.push(cur);
+    });
+    items = items.map(function (s) { return s.trim(); }).filter(function (s) { return /[가-힣]/.test(s); });
+    var unknown = items.filter(function (s) { return !LL.findIngredients(s).length; });
+    return { total: items.length, known: items.length - unknown.length, unknown: unknown };
   };
 
   LL.verdict = function (hits, reasons, prefs) {

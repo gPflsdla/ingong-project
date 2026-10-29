@@ -96,10 +96,15 @@
         var c = active.no.indexOf(t) !== -1 ? (h.facility ? " chk" : " hit") : active.check.indexOf(t) !== -1 ? " chk" : "";
         return '<span class="tag' + c + '">' + esc(LL.tagName(t)) + "</span>";
       }).join("");
-      if (!h.entry.tags.length) tags = '<span class="tag">' + esc(LL.t("plantBased")) + "</span>";
+      if (!h.entry.tags.length) tags = '<span class="tag">' + esc(LL.t(/plant/.test(h.entry.en) ? "plantBased" : "noConcern")) + "</span>";
       if (h.facility) tags = '<span class="tag chk">' + esc(LL.t("facilityOnly")) + "</span>" + tags;
       rows.push('<tr' + (h.facility ? ' class="fac"' : "") + '><td lang="ko"><b>' + esc(h.entry.ko) + "</b></td><td>" + esc(h.entry.en) + "</td><td>" + tags + "</td></tr>");
     });
+    // 원재료 N개 중 M개 인식 (6-2): 모르는 원재료는 사진 인식이 틀렸을 수 있어서 따로 보여 줌
+    var count = LL.countItems(text);
+    $("ingCount").textContent = count.total ? LL.t("countLine", { known: count.known, total: count.total }) : "";
+    $("unknownLine").hidden = !count.unknown.length;
+    $("unknownLine").innerHTML = count.unknown.length ? esc(LL.t("unknownItems")) + " " + count.unknown.map(function (u) { return '<span class="kterm unk" lang="ko">' + esc(u) + "</span>"; }).join(" ") : "";
     $("ingTable").innerHTML = rows.length ? rows.join("") :
       '<tr><td colspan="3" class="empty">' + esc(text.trim() ? LL.t("noIngredients") : LL.t("nothingYet")) + "</td></tr>";
 
@@ -116,7 +121,7 @@
   // 지금 고른 제한에서 "먹을 수 없음"과 "확인 필요"에 해당하는 태그 모음
   function activeTags() {
     var no = prefs.allergies.slice(), check = [];
-    prefs.allergies.forEach(function (a) { var m = { wheat: "maybeWheat", milk: "maybeMilk", egg: "maybeEgg" }[a]; if (m) check.push(m); });
+    prefs.allergies.forEach(function (a) { var m = { wheat: "maybeWheat", milk: "maybeMilk", egg: "maybeEgg", soy: "maybeSoy" }[a]; if (m) check.push(m); });
     prefs.diets.forEach(function (id) { var d = byId(LL.DIETS, id); no = no.concat(d.no); check = check.concat(d.check); });
     return { no: no, check: check };
   }

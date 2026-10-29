@@ -230,7 +230,11 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-c
 .reason .why { font-size: 13.5px; color: var(--muted); }
 .kterm { font-weight: 700; background: var(--mark); color: var(--ink); padding: 0 4px; border-radius: 3px; }
 
-/* 성분표 (5-2) */
+/* 성분표 (5-2), 인식 개수 (6-2) */
+.panel-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.panel-title .count { font-size: 13px; font-weight: 700; color: var(--accent); }
+.unknown { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.9; }
+.kterm.unk { background: var(--warn-soft); color: var(--warn); font-weight: 500; }
 .tbl-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }

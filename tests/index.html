@@ -63,7 +63,13 @@
       { what: "예시: 초코 과자 + 할랄", text: LL.SAMPLES[0].text, prefs: P(["halal"]), verdict: "bad", has: ["돼지", "젤라틴"] },
       { what: "같은 제조시설의 땅콩은 '혼입 가능성' (먹을 수 없음 아님)", text: LL.SAMPLES[0].text, prefs: P([], ["peanut"]), verdict: "warn", reason: { level: "warn", kind: "facility", target: "peanut" } },
       { what: "라면: 같은 제조시설의 돼지고기는 할랄 판정에 안 씀", text: LL.SAMPLES[1].text, prefs: P(["nopork"]), verdict: "ok", noReasonKind: "diet" },
-      { what: "아는 성분이 하나도 없으면 '판단할 수 없음'", text: "정제수, 과당, 구연산", prefs: P(["vegan"]), verdict: "unknown" },
+      { what: "아는 성분이 하나도 없으면 '판단할 수 없음'", text: "가나다라, 마바사, 아자차", prefs: P(["vegan"]), verdict: "unknown" },
+      { what: "흔한 원재료(정제수, 과당, 구연산)도 인식 → 비건 문제 없음", text: "정제수, 과당, 구연산", prefs: P(["vegan"]), verdict: "ok", has: ["정제수", "과당", "구연산"] },
+      { what: "돼지감자는 식물 (돼지고기 아님)", text: "돼지감자, 정제수", prefs: P(["halal"]), verdict: "ok", has: ["돼지감자"], notTags: ["pork"] },
+      { what: "황도는 복숭아", text: "황도, 설탕", prefs: P([], ["peach"]), verdict: "bad", has: ["황도"] },
+      { what: "레시틴은 대두 알레르기 확인 필요", text: "설탕, 레시틴", prefs: P([], ["soy"]), verdict: "warn", has: ["레시틴"] },
+      { what: "캔 음료 원재료 12개 모두 인식", text: "정제수, 설탕, 기타과당, 구연산, 그레이프후르츠과즙(남아공산), 구연산삼나트륨, 향료, 정제소금(국산), 비타민C, 염화칼륨, 젖산칼슘, 염화마그네슘", prefs: P(["vegan"]), verdict: "ok", count: [12, 12] },
+      { what: "인식 개수: 모르는 원재료는 따로 셈", text: "원재료명: 설탕, 가나다, 소맥분(밀:미국산)\n밀 함유", prefs: P([], ["wheat"]), verdict: "bad", count: [2, 3] },
       { what: "엉터리 글자만 있으면 '판단할 수 없음'", text: "0265 ..ㅡ×허은 도22 기 .2322", prefs: P(["halal"]), verdict: "unknown" },
       { what: "같은 제조시설 문장만 있으면 '판단할 수 없음'", text: "이 제품은 땅콩을 사용한 제품과 같은 제조시설에서 제조하고 있습니다.", prefs: P([], ["peanut"]), verdict: "unknown" },
       { what: "예시: 라면 + 할랄 (주정 때문에 불가)", text: LL.SAMPLES[1].text, prefs: P(["halal"]), verdict: "bad", has: ["발효주정", "쇠고기추출물"] },
@@ -81,6 +87,7 @@
       (tc.has || []).forEach(function (k) { if (found.indexOf(k) === -1) errors.push("'" + k + "'를 못 찾음"); });
       (tc.notTags || []).forEach(function (t) { if (tags.indexOf(t) !== -1) errors.push("'" + t + "' 태그가 붙음"); });
       if (tc.reason && !reasons.some(function (r) { return r.level === tc.reason.level && r.kind === tc.reason.kind && r.target === tc.reason.target; })) errors.push("기대한 이유(" + tc.reason.kind + ", " + tc.reason.target + ")가 없음");
+      if (tc.count) { var cnt = LL.countItems(tc.text); if (cnt.known !== tc.count[0] || cnt.total !== tc.count[1]) errors.push("인식 개수 " + cnt.known + "/" + cnt.total + " (기대 " + tc.count[0] + "/" + tc.count[1] + ")"); }
       if (tc.noReasonKind && reasons.some(function (r) { return r.kind === tc.noReasonKind; })) errors.push("'" + tc.noReasonKind + "' 이유가 나오면 안 됨");
       var ok = errors.length === 0; if (ok) passed++;
       rows += "<tr><td>" + (i + 1) + '</td><td class="r ' + (ok ? "pass" : "fail") + '">' + (ok ? "통과" : "실패") + "</td><td>" + esc(tc.what) +
