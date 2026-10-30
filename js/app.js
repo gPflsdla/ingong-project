@@ -49,6 +49,7 @@
     renderRules();
     renderMenu();
     if (!$("sheet").hidden) renderSheet();
+    if (!$("callSheet").hidden) renderCalls();
   });
   // "다 골랐어요": 칸을 접고 메뉴로 이동
   $("rulesDone").addEventListener("click", function () {
@@ -365,7 +366,7 @@
   }
   function pollMyOrders() {
     clearTimeout(myTimer);
-    var list = loadMyOrders().filter(function (o) { return myStatus[o.id] !== "done"; });
+    var list = loadMyOrders().filter(function (o) { return myStatus[o.id] !== "done" && myStatus[o.id] !== "deleted"; });
     if (!list.length) return;
     Promise.all(list.map(function (o) {
       return fetchT(LL.API_URL + "/orders/" + o.id + "?token=" + encodeURIComponent(o.token), {}, 8000)
@@ -393,6 +394,63 @@
   LL.checkServer = checkServer;
   window.addEventListener("offline", function () { $("serverNote").hidden = false; });
   window.addEventListener("online", checkServer);
+
+  // ---------- 직원 호출 (12-13) ----------
+  // 키오스크의 "물 주세요, 직원 호출" 버튼처럼 누르면 사장님 화면에 바로 뜸. 같은 요청은 1분 동안 다시 못 누르게 함
+  var CALLS = [
+    { kind: "water", icon: "💧" }, { kind: "staff", icon: "🙋" }, { kind: "utensils", icon: "🥢" },
+    { kind: "napkin", icon: "🧻" }, { kind: "bill", icon: "🧾" }
+  ];
+  var callSentAt = {};   // { 종류: 보낸 시각 }
+  function renderCalls() {
+    $("callGrid").innerHTML = CALLS.map(function (c) {
+      var done = Date.now() - (callSentAt[c.kind] || 0) < 60000;
+      return '<button type="button" class="call-tile' + (done ? " sent" : "") + '" data-kind="' + c.kind + '"' + (done ? " disabled" : "") + ">" +
+        '<span class="call-icon" aria-hidden="true">' + c.icon + "</span><span>" + esc(LL.t("call_" + c.kind)) + "</span>" +
+        (done ? '<span class="call-sent">' + esc(LL.t("callRequested")) + "</span>" : "") + "</button>";
+    }).join("");
+  }
+  function openCalls() {
+    $("toast").hidden = true;
+    $("callTable").value = $("tableNum").value;
+    $("callMsg").textContent = "";
+    renderCalls();
+    $("callSheet").hidden = false; $("callBg").hidden = false; document.body.classList.add("no-scroll");
+    $("callClose").focus();
+  }
+  function closeCalls() { $("callSheet").hidden = true; $("callBg").hidden = true; document.body.classList.remove("no-scroll"); $("callOpen").focus(); }
+  $("callOpen").addEventListener("click", openCalls);
+  $("callClose").addEventListener("click", closeCalls);
+  $("callBg").addEventListener("click", closeCalls);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("callSheet").hidden) closeCalls(); });
+  // 호출 화면에서 넣은 자리 번호는 주문 화면에도 그대로 쓰임
+  $("callTable").addEventListener("input", function () {
+    $("tableNum").value = this.value;
+    $("tableNum").dispatchEvent(new Event("input"));
+    $("callTable").classList.toggle("bad", !!this.value && !currentTable());
+  });
+  $("callGrid").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-kind]"); if (!b) return;
+    var msg = $("callMsg"), kind = b.getAttribute("data-kind");
+    var table = currentTable();
+    if (!table) { msg.className = "form-msg err"; msg.textContent = LL.t("needTable"); $("callTable").focus(); return; }
+    b.disabled = true;
+    fetchT(LL.API_URL + "/calls", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ store: LL.STORE.id, table: table, kind: kind })
+    }, 8000).then(function (r) {
+      if (!r.ok) throw new Error("call " + r.status);
+      callSentAt[kind] = Date.now();
+      renderCalls();
+      closeCalls();
+      toast(LL.t("callSent", { what: LL.t("call_" + kind) }));
+      setTimeout(function () { if (!$("callSheet").hidden) renderCalls(); }, 60500);
+    }).catch(function () {
+      b.disabled = false;
+      msg.className = "form-msg err"; msg.textContent = LL.t("callFailed");
+      checkServer();
+    });
+  });
 
   var toastTimer;
   function toast(text) {

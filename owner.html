@@ -48,7 +48,15 @@
 
     <!-- 주문 목록 (11-2 ~ 11-4) -->
     <main id="board" hidden>
-      <div class="summary-row" id="summaryRow"></div>
+      <div class="board-tools">
+        <div class="summary-row" id="summaryRow"></div>
+        <button type="button" class="btn reset" id="resetAll">전체 지우기</button>
+      </div>
+      <!-- 12-13: 손님 호출 (물, 직원, 수저 등) -->
+      <section class="calls" id="callsBox" hidden>
+        <h2 class="col-title">손님 호출</h2>
+        <div id="callList"></div>
+      </section>
       <section>
         <h2 class="col-title">들어온 주문 <span class="hint">알레르기 주문이 맨 위에 와요</span></h2>
         <div class="orders" id="active"></div>

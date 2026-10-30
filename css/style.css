@@ -307,3 +307,27 @@ body.no-scroll { overflow: hidden; }
 /* 12단계: 주문 서버 연결 안내 (Todo 12-2) */
 .server-note { margin: 0; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.55;
   color: var(--warn); background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
+
+/* 12-13: 직원 호출 버튼과 호출 화면 */
+.call-open {
+  font: inherit; cursor: pointer; width: 100%; margin-top: 16px;
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border: 1.5px solid var(--accent); border-radius: var(--radius); background: var(--accent-soft); color: var(--accent); text-align: left;
+}
+.call-open svg { flex: none; }
+.call-open-text { flex: 1; display: flex; flex-direction: column; line-height: 1.35; }
+.call-open-text b { font-size: 16px; }
+.call-open-text span { font-size: 13px; color: var(--muted); }
+.call-open-go { font-size: 24px; line-height: 1; }
+.call-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.call-tile {
+  font: inherit; cursor: pointer; min-height: 96px; padding: 14px 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 600;
+}
+.call-tile:hover:not(:disabled) { border-color: var(--accent); }
+.call-tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.call-icon { font-size: 30px; line-height: 1; }
+.call-tile.sent { opacity: 0.6; cursor: default; }
+.call-sent { font-size: 12px; font-weight: 700; color: var(--accent); }
+.mo-st.deleted { background: var(--mark); color: var(--muted); }

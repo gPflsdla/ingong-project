@@ -2,6 +2,7 @@
 // SafeOrder 사장님 화면 (PRD #4-5, Todo 11-1 ~ 11-4)
 // - 가게 코드를 넣으면 4초마다 서버에서 새 주문·바뀐 주문만 불러옴 (PRD #9: polling)
 // - 알레르기·식단 정보가 있는 주문을 맨 위에, 못 먹는 메뉴는 빨갛게 보여 줌
+// - 12-13: 손님 호출(물, 직원, 수저 등) 표시, 주문 하나 지우기, 전체 지우기
 // =========================================================
 (function () {
   "use strict";
@@ -17,6 +18,8 @@
   var code = "";
   try { code = localStorage.getItem(CODE_KEY) || ""; } catch (e) { code = ""; }
   var orders = {};      // { 주문 id: 주문 }
+  var calls = {};       // { 호출 id: 호출 } (12-13)
+  var CALL_NAMES = { water: "물 주세요", staff: "직원 호출", utensils: "수저·앞접시", napkin: "휴지 주세요", bill: "계산할게요" };
   var since = 0;        // 서버가 알려 준 마지막 시각. 다음에는 그 뒤에 바뀐 것만 받음
   var timer = null, firstLoad = true, failCount = 0;
 
@@ -40,16 +43,24 @@
     api("GET", "/orders?since=" + since).then(function (data) {
       failCount = 0;
       setConn(true);
-      var fresh = [];
+      var fresh = [], freshCalls = [];
       data.orders.forEach(function (o) {
+        if (o.status === "deleted") { delete orders[o.id]; return; }   // 지운 주문은 화면에서 뺌 (다른 기기에서 지운 것도)
         if (!orders[o.id] && !firstLoad && o.status === "new") fresh.push(o);
         orders[o.id] = o;
       });
+      (data.calls || []).forEach(function (c) {
+        if (!calls[c.id] && !firstLoad && c.status === "new") freshCalls.push(c);
+        calls[c.id] = c;
+      });
+      // 전체 지우기를 하면 서버에서 호출이 사라지므로, 서버 목록에 없는 오래된 호출도 정리
+      Object.keys(calls).forEach(function (id) { if (data.now - calls[id].createdAt > 24 * 3600e3) delete calls[id]; });
       // 24시간 지나 서버에서 지워진 주문은 화면에서도 뺌
       Object.keys(orders).forEach(function (id) { if (data.now - orders[id].createdAt > 24 * 3600e3) delete orders[id]; });
       since = data.now - 1;
       firstLoad = false;
       if (fresh.length) alertNew(fresh);
+      if (freshCalls.length) alertCalls(freshCalls);
       render();
     }).catch(function (e) {
       if (e.message === "code") { logout("가게 코드가 맞지 않아요. 다시 입력해 주세요."); return; }
@@ -87,6 +98,17 @@
     list.forEach(function (o) { o._fresh = true; });
   }
 
+  function alertCalls(list) {
+    beep();
+    toast("호출 " + list.map(function (c) { return c.table + "번 " + CALL_NAMES[c.kind]; }).join(", "));
+  }
+
+  // ---------- 두 번 눌러야 지워지는 버튼 (12-13) ----------
+  // 실수로 지우지 않게, 처음 누르면 "한 번 더 누르면 지워져요"로 바뀌고 4초 안에 다시 눌러야 지워짐
+  var armed = { key: "", until: 0 };
+  function isArmed(key) { return armed.key === key && Date.now() < armed.until; }
+  function arm(key) { armed = { key: key, until: Date.now() + 4000 }; render(); setTimeout(render, 4100); }
+
   // ---------- 그리기 (11-3) ----------
   function prefNames(p) {
     var a = p.allergies.map(function (id) { var x = byId(LL.ALLERGENS, id); return x ? x.ko : id; });
@@ -123,7 +145,9 @@
       '<span class="status ' + o.status + '">' + STATUS[o.status] + "</span></header>" +
       alert + '<ul class="items">' + items + "</ul>" +
       (o.memo ? '<p class="memo"><b>요청사항</b> ' + esc(o.memo) + "</p>" : "") +
-      '<div class="actions">' + btn + "</div></article>";
+      '<div class="actions">' + btn +
+        '<button type="button" class="btn del' + (isArmed("o" + o.id) ? " armed" : "") + '" data-del="' + o.id + '">' +
+        (isArmed("o" + o.id) ? "한 번 더 누르면 지워져요" : "주문 지우기") + "</button></div></article>";
   }
 
   function render() {
@@ -136,12 +160,23 @@
     $("active").innerHTML = active.length ? active.map(card).join("") : '<p class="empty">아직 들어온 주문이 없어요. 손님이 주문하면 몇 초 안에 여기에 떠요.</p>';
     $("done").innerHTML = done.map(card).join("");
     $("doneCount").textContent = done.length ? "(" + done.length + ")" : "";
+    // 손님 호출 (12-13): 처리 안 된 것만, 먼저 온 순서
+    var open = Object.keys(calls).map(function (k) { return calls[k]; }).filter(function (c) { return c.status === "new"; })
+      .sort(function (a, b) { return a.createdAt - b.createdAt; });
+    $("callsBox").hidden = !open.length;
+    $("callList").innerHTML = open.map(function (c) {
+      return '<div class="call"><span class="call-table">' + c.table + '번</span><span class="call-what">' + esc(CALL_NAMES[c.kind] || c.kind) +
+        '</span><span class="meta">' + ago(c.createdAt) + '</span><button type="button" class="btn primary" data-call="' + c.id + '">처리했어요</button></div>';
+    }).join("");
+    $("resetAll").textContent = isArmed("all") ? "한 번 더 누르면 모두 지워져요" : "전체 지우기";
+    $("resetAll").classList.toggle("armed", isArmed("all"));
     var nNew = active.filter(function (o) { return o.status === "new"; }).length;
     var nAllergy = active.filter(function (o) { return o.hasAllergy; }).length;
     $("summaryRow").innerHTML = '<span class="stat"><b>' + nNew + "</b> 새 주문</span>" +
       '<span class="stat"><b>' + (active.length - nNew) + "</b> 조리 중</span>" +
-      '<span class="stat warn"><b>' + nAllergy + "</b> 알레르기 주문</span>";
-    document.title = (nNew ? "(" + nNew + ") " : "") + "사장님 화면 · SafeOrder";
+      '<span class="stat warn"><b>' + nAllergy + "</b> 알레르기 주문</span>" +
+      (open.length ? '<span class="stat call-stat"><b>' + open.length + "</b> 호출</span>" : "");
+    document.title = (nNew + open.length ? "(" + (nNew + open.length) + ") " : "") + "사장님 화면 · SafeOrder";
     list.forEach(function (o) { delete o._fresh; });
   }
 
@@ -158,10 +193,43 @@
     });
   });
 
+  // ---------- 주문 지우기, 전체 지우기, 호출 처리 (12-13) ----------
+  function fail(err, msg) {
+    if (err.message === "code") logout("가게 코드가 맞지 않아요. 다시 입력해 주세요.");
+    else toast(msg);
+  }
+  document.addEventListener("click", function (e) {
+    var d = e.target.closest("[data-del]");
+    if (d) {
+      var id = d.getAttribute("data-del");
+      if (!isArmed("o" + id)) { arm("o" + id); return; }
+      armed = { key: "", until: 0 };
+      d.disabled = true;
+      api("DELETE", "/orders/" + id).then(function () { delete orders[id]; render(); toast(id + "번 주문을 지웠어요."); })
+        .catch(function (err) { d.disabled = false; fail(err, "지우지 못했어요. 다시 눌러 주세요."); });
+      return;
+    }
+    var c = e.target.closest("[data-call]");
+    if (c) {
+      c.disabled = true;
+      api("PATCH", "/calls/" + c.getAttribute("data-call"), { status: "done" }).then(function (x) { calls[x.id] = x; render(); })
+        .catch(function (err) { c.disabled = false; fail(err, "처리하지 못했어요. 다시 눌러 주세요."); });
+    }
+  });
+  $("resetAll").addEventListener("click", function () {
+    if (!isArmed("all")) { arm("all"); return; }
+    armed = { key: "", until: 0 };
+    $("resetAll").disabled = true;
+    api("POST", "/reset", { confirm: "all" }).then(function () {
+      orders = {}; calls = {}; render(); toast("주문과 호출을 모두 지웠어요.");
+    }).catch(function (err) { fail(err, "지우지 못했어요. 다시 눌러 주세요."); })
+      .then(function () { $("resetAll").disabled = false; });
+  });
+
   // ---------- 가게 코드 (11-1) ----------
   function start() {
     $("login").hidden = true; $("board").hidden = false;
-    orders = {}; since = 0; firstLoad = true;
+    orders = {}; calls = {}; since = 0; firstLoad = true;
     clearTimeout(timer); poll();
   }
   function logout(msg) {

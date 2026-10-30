@@ -16,3 +16,14 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at  INTEGER NOT NULL               -- 마지막으로 바뀐 시각 (밀리초)
 );
 CREATE INDEX IF NOT EXISTS idx_orders_updated ON orders(updated_at);
+
+-- 직원 호출 표 (12-13). 서버(order-api.js)가 처음 쓸 때 알아서 만들기 때문에 따로 실행하지 않아도 됨
+CREATE TABLE IF NOT EXISTS calls (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  store       TEXT    NOT NULL,
+  table_no    INTEGER NOT NULL,
+  kind        TEXT    NOT NULL,              -- water(물) / staff(직원) / utensils(수저·앞접시) / napkin(휴지) / bill(계산)
+  status      TEXT    NOT NULL DEFAULT 'new',-- new(요청) → done(처리함)
+  created_at  INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL
+);

@@ -68,3 +68,18 @@
 .demo-code p { margin: 0; }
 .demo-code code { font-size: 17px; font-weight: 700; color: var(--accent); background: var(--surface); padding: 2px 10px; border-radius: 8px; letter-spacing: 0.02em; }
 .demo-code .btn { margin-top: 4px; border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+/* 12-13: 손님 호출, 주문 지우기, 전체 지우기 */
+.board-tools { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.btn.reset { color: var(--muted); }
+.btn.reset.armed, .btn.del.armed { background: var(--bad); border-color: var(--bad); color: var(--surface); font-weight: 700; }
+.stat.call-stat b { color: var(--accent); }
+.calls .col-title { margin-bottom: 8px; }
+#callList { display: flex; flex-direction: column; gap: 8px; }
+.call { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--accent-soft); border: 1.5px solid var(--accent); }
+.call-table { font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1; }
+.call-what { font-size: 18px; font-weight: 700; flex: 1; }
+.call .btn { padding: 10px 16px; }
+.actions { display: flex; flex-direction: column; gap: 6px; }
+.btn.del { align-self: flex-end; border: 0; background: transparent; color: var(--muted); font-size: 13px; padding: 6px 10px; }
+.btn.del.armed { align-self: stretch; padding: 10px; font-size: 14px; }

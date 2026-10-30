@@ -32,6 +32,12 @@
         </div>
       </div>
       <p class="tagline" data-i18n="tagline"></p>
+      <!-- 12-13: 직원 호출 (자리마다 있는 키오스크의 "물 주세요, 직원 호출" 버튼처럼) -->
+      <button type="button" class="call-open" id="callOpen">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 15.4A1 1 0 0 0 5.2 17h13.6a1 1 0 0 0 .9-1.6L18 12.6V9a6 6 0 0 0-6-6zm0 18a2.5 2.5 0 0 0 2.4-2h-4.8A2.5 2.5 0 0 0 12 21z" fill="currentColor"/></svg>
+        <span class="call-open-text"><b data-i18n="callOpen"></b><span data-i18n="callHint"></span></span>
+        <span class="call-open-go" aria-hidden="true">›</span>
+      </button>
     </header>
 
     <!-- 12단계: 주문 서버에 연결이 안 될 때 안내 (PRD #7, Todo 12-2) -->
@@ -116,6 +122,25 @@
         </div>
         <p class="form-msg" id="formMsg" role="status"></p>
         <button type="button" class="btn primary big" id="placeOrder" data-i18n="placeOrder"></button>
+      </div>
+    </section>
+    <!-- 12-13: 직원 호출 화면 -->
+    <div class="sheet-bg" id="callBg" hidden></div>
+    <section class="sheet" id="callSheet" role="dialog" aria-modal="true" aria-labelledby="callTitle" hidden>
+      <div class="sheet-head">
+        <h2 id="callTitle" data-i18n="callTitle"></h2>
+        <button type="button" class="btn" id="callClose" data-i18n="close"></button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="callTable" data-i18n="table"></label>
+          <div class="table-input">
+            <input id="callTable" type="number" inputmode="numeric" min="1" max="50" step="1" autocomplete="off">
+            <span class="unit" data-i18n="tableUnit"></span>
+          </div>
+        </div>
+        <div class="call-grid" id="callGrid"></div>
+        <p class="form-msg" id="callMsg" role="status"></p>
       </div>
     </section>
     <div class="toast" id="toast" hidden></div>
