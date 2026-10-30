@@ -72,8 +72,9 @@ body {
 .title-row { align-items: center; }
 .brand { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
 .brand img { width: 30px; height: 30px; display: block; }
-/* 앱 이름 글자(12-12): 동글동글한 Fredoka 소문자 + 파랑. 로고 그림과 함께 한 덩어리로 보이게 */
-.wordmark { font-family: "Fredoka", var(--font-body); font-weight: 700; font-size: 25px; line-height: 1; letter-spacing: -0.01em; color: var(--accent); }
+/* 앱 이름 글자(12-12): 동글동글한 Fredoka 글꼴, "Safe"는 글자색 + "Order"는 파랑 (사용자가 시안 3번과 4번을 섞어 고름) */
+.wordmark { font-family: "Fredoka", var(--font-body); font-weight: 700; font-size: 25px; line-height: 1; letter-spacing: -0.01em; color: var(--ink); }
+.wordmark span { color: var(--accent); }
 .brand-sub { font-size: 14px; font-weight: 600; color: var(--muted); padding-left: 10px; margin-left: 2px; border-left: 1px solid var(--line); }
 a.brand { text-decoration: none; }
 /* 가게 로고(12-10): 사장님이 준 원형 로고. 다크 모드에서도 흰 원이 그대로 보이게 둠 */
