@@ -1,0 +1,28 @@
+/* 처음 화면 (12-11): 손님 / 사장님 고르기. 색과 글꼴은 css/style.css 토큰을 그대로 씀 */
+.home { padding-bottom: 48px; gap: 24px; }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 7.5vw, 40px); line-height: 1.3; margin: 12px 0 12px; letter-spacing: -0.01em; }
+.hero p { margin: 0; font-size: 15.5px; max-width: 34em; }
+.store-chip { display: inline-flex; align-items: center; gap: 12px; margin-top: 18px; padding: 8px 16px 8px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; line-height: 1.4; }
+.store-chip img { border-radius: 50%; box-shadow: 0 0 0 1px var(--line); background: #fff; }
+
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.choice {
+  display: flex; flex-direction: column; gap: 6px; padding: 22px 20px 20px;
+  border: 1.5px solid var(--line); border-radius: 18px; color: var(--ink); text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.choice:hover, .choice:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.choice-who { font-size: 13px; font-weight: 700; color: var(--accent); }
+.choice-title { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.2; }
+.choice-desc { font-size: 14px; color: var(--muted); }
+.choice-code { font-size: 14px; margin-top: 4px; }
+.choice-go {
+  margin-top: 12px; align-self: stretch; text-align: center; padding: 12px; border-radius: 999px;
+  background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 15px;
+}
+.choice.owner .choice-go { background: var(--surface); color: var(--accent); border: 1.5px solid var(--accent); }
+code { font-family: var(--font-body); font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 1px 8px; border-radius: 6px; }
+
+.try h2 { margin: 0 0 10px; font-size: 17px; }
+.try ol { margin: 0 0 12px; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; }
+footer a { color: var(--muted); }

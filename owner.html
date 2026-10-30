@@ -17,7 +17,7 @@
     <!-- 11단계: 사장님 화면 (PRD #4-5) -->
     <header class="owner-head">
       <div>
-        <span class="brand"><img src="images/logo-safeorder.svg" alt="" width="24" height="24">SafeOrder · 사장님 화면</span>
+        <a class="brand" href="./" title="처음 화면"><img src="images/logo-safeorder.svg" alt="" width="24" height="24">SafeOrder · 사장님 화면</a>
         <div class="store">
           <img class="store-logo" src="images/logo-hallabunsik.png" alt="" width="64" height="64">
           <h1 id="storeName"></h1>
@@ -32,12 +32,18 @@
     <!-- 가게 코드 입력 (11-1) -->
     <section class="panel login" id="login">
       <h2>가게 코드를 입력하세요</h2>
-      <p class="hint">Cloudflare에 비밀 값(STORE_CODE)으로 넣어 둔 코드예요. 이 기기에만 기억해요.</p>
+      <p class="hint">가게 코드를 넣으면 들어온 주문을 실시간으로 받을 수 있어요. 넣은 코드는 이 기기에만 기억해요.</p>
       <form id="loginForm">
         <input type="password" id="code" autocomplete="current-password" aria-label="가게 코드" required>
         <button type="submit" class="btn primary">주문 받기 시작</button>
       </form>
       <p class="form-msg err" id="loginMsg" role="alert"></p>
+      <!-- 12-11: 평가하시는 분이 바로 체험할 수 있게 체험용 코드를 공개 -->
+      <div class="demo-code">
+        <p><b>체험용 가게 코드</b> <code>gagae1111</code></p>
+        <p class="hint">과제 시연용 코드라 누구나 볼 수 있어요. 주문은 24시간 뒤 자동으로 지워져요.</p>
+        <button type="button" class="btn" id="demoFill">체험용 코드로 들어가기</button>
+      </div>
     </section>
 
     <!-- 주문 목록 (11-2 ~ 11-4) -->

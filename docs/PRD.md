@@ -82,7 +82,8 @@ SafeOrder는
 
 ## 7. 기술 조건
 
-- 결과물 형태: 브라우저에서 실행되는 웹앱 두 화면 (손님 `index.html`, 사장님 `owner.html`), 깃허브 Pages로 배포
+- 결과물 형태: 브라우저에서 실행되는 웹앱. 처음 화면 `index.html`에서 손님 화면 `order.html`과 사장님 화면 `owner.html` 중 고름 (12-11에서 변경), 깃허브 Pages로 배포
+  - 과제 시연을 위해 체험용 가게 코드를 화면에 공개함. 실제 가게에서는 공개하지 않음
 - 사용할 도구나 언어: HTML, CSS, JavaScript
 - 서버: Cloudflare Workers(무료) + Cloudflare D1(무료 SQL 데이터베이스)에 주문을 저장. 사장님 화면은 몇 초마다 새 주문을 불러옴
 - 지켜야 할 조건:

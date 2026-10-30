@@ -1,136 +1,69 @@
 <!doctype html>
+<!-- 처음 화면 (12-11): 손님 주문하기 / 사장님 화면 중 고르기. 평가하시는 분이 한 주소에서 두 화면을 모두 볼 수 있게 함 -->
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>SafeOrder</title>
+  <title>SafeOrder · 한라분식</title>
+  <meta name="description" content="알레르기·식단을 미리 알리고 주문하는 식당 QR 주문 웹앱">
   <link rel="icon" href="images/logo-safeorder.svg" type="image/svg+xml">
-  <meta name="description" content="Order with your allergies and diet already on the ticket.">
+  <script>
+    // 예전 QR 주소(…/?table=3)로 들어오면 손님 화면으로 바로 보냄
+    if (/[?&]table=/.test(location.search)) location.replace("order.html" + location.search);
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-  <div class="wrap">
-    <!-- 머리말: 가게 이름, 앱 이름, 언어 전환 (PRD #1, #6, #4-7) -->
-    <header class="site-header">
-      <div class="title-row">
-        <span class="brand"><img src="images/logo-safeorder.svg" alt="" width="24" height="24">SafeOrder</span>
-        <div class="lang" role="group" aria-label="Language / 언어">
-          <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
-          <button type="button" data-lang="en" aria-pressed="false">English</button>
-        </div>
-      </div>
-      <!-- 가게 로고와 이름 (12-10) -->
-      <div class="store">
-        <img class="store-logo" src="images/logo-hallabunsik.png" alt="" width="76" height="76">
-        <div>
-          <h1 id="storeName"></h1>
-          <p class="store-desc" id="storeDesc"></p>
-        </div>
-      </div>
-      <p class="tagline" data-i18n="tagline"></p>
+  <div class="wrap home">
+    <header class="title-row">
+      <span class="brand"><img src="images/logo-safeorder.svg" alt="" width="24" height="24">SafeOrder</span>
     </header>
 
-    <!-- 12단계: 주문 서버에 연결이 안 될 때 안내 (PRD #7, Todo 12-2) -->
-    <p class="server-note" id="serverNote" role="status" data-i18n="serverDown" hidden></p>
-
-    <!-- 1단계 화면: 못 먹는 것 고르기 (PRD #4-1, Todo 8-3). 다 고르면 접혀서 고른 것만 한 줄로 보임 -->
-    <details class="panel rules" id="rulesBox">
-      <summary>
-        <span class="step" aria-hidden="true">1</span>
-        <span class="rules-text">
-          <span class="rules-title" data-i18n="myRules"></span>
-          <span class="summary" id="ruleSummary"></span>
-        </span>
-        <span class="rules-edit" data-i18n="edit"></span>
-      </summary>
-      <div class="rules-body">
-        <div class="chipset">
-          <span class="lbl" data-i18n="allergies"></span>
-          <div class="chips" id="allergyChips"></div>
-        </div>
-        <div class="chipset">
-          <span class="lbl" data-i18n="diet"></span>
-          <div class="chips" id="dietChips"></div>
-        </div>
-        <p class="hint" data-i18n="rulesHint"></p>
-        <button type="button" class="btn primary big" id="rulesDone" data-i18n="rulesDone"></button>
-      </div>
-    </details>
-
-    <!-- 11단계: 내 주문 상태 (PRD #4-6, Todo 11-5) -->
-    <section class="panel my-orders" id="myOrders" aria-live="polite" hidden>
-      <h2 data-i18n="myOrders"></h2>
-      <ul id="myOrderList"></ul>
-    </section>
-
-    <!-- 2단계 화면: 메뉴 고르기 (PRD #4-2, Todo 8-2, 8-4, 8-5) -->
-    <main id="menuArea">
-      <h2 class="step-title"><span class="step" aria-hidden="true">2</span><span data-i18n="stepMenu"></span></h2>
-      <div class="menu-tools">
-        <nav class="cats" id="cats" aria-label="Categories"></nav>
-      </div>
-      <label class="only-safe" id="onlySafeWrap"><input type="checkbox" id="onlySafe" role="switch"> <span data-i18n="onlySafe"></span></label>
-      <p class="hint" id="menuHint"></p>
-      <div id="menu"></div>
-    </main>
-
-    <!-- 9단계: 아래 고정 장바구니 막대 -->
-    <div class="cart-bar" id="cartBar" hidden>
-      <span id="cartSum"></span>
-      <button type="button" class="btn primary" id="openCart" data-i18n="viewCart"></button>
-    </div>
-
-    <!-- 9단계: 주문 확인 화면 -->
-    <div class="sheet-bg" id="sheetBg" hidden></div>
-    <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
-      <div class="sheet-head">
-        <h2 id="sheetTitle" data-i18n="cartTitle"></h2>
-        <button type="button" class="btn" id="closeCart" data-i18n="close"></button>
-      </div>
-      <div class="sheet-body">
-        <!-- 자리 번호: 손님이 직접 넣음. QR 주소에 번호가 있으면 미리 채워 둠 (Todo 9-2 변경) -->
-        <div class="field">
-          <label for="tableNum" data-i18n="table"></label>
-          <div class="table-input">
-            <input id="tableNum" type="number" inputmode="numeric" min="1" max="50" step="1" autocomplete="off">
-            <span class="unit" data-i18n="tableUnit"></span>
-          </div>
-          <p class="hint" id="tableHint"></p>
-        </div>
-        <ul class="cart-list" id="cartList"></ul>
-        <p class="cart-total"><span data-i18n="total"></span> <b id="cartTotal"></b></p>
-        <div class="send-box" id="sendBox"></div>
-        <div class="bad-box" id="badBox" hidden>
-          <p class="bad-title" data-i18n="badWarnTitle"></p>
-          <ul id="badList"></ul>
-          <label class="ack"><input type="checkbox" id="ack"> <span data-i18n="badWarnAck"></span></label>
-        </div>
-        <p class="warn-note" id="warnNote" data-i18n="warnNote" hidden></p>
-        <div class="field">
-          <label for="memo" data-i18n="memo"></label>
-          <textarea id="memo" rows="2" maxlength="200"></textarea>
-        </div>
-        <p class="form-msg" id="formMsg" role="status"></p>
-        <button type="button" class="btn primary big" id="placeOrder" data-i18n="placeOrder"></button>
+    <section class="hero">
+      <h1>못 먹는 것을 먼저 알리고,<br>안심하고 주문하세요</h1>
+      <p>식당 QR 주문 화면에서 내 알레르기와 식단을 고르면, 먹을 수 없는 메뉴를 알려 주고 주문할 때 주방에도 함께 전해 주는 웹앱이에요.</p>
+      <div class="store-chip">
+        <img src="images/logo-hallabunsik.png" alt="" width="44" height="44">
+        <span><b>예시 가게: 한라분식</b><br><span class="hint">제주대 앞 분식집 · 메뉴 15개</span></span>
       </div>
     </section>
-    <div class="toast" id="toast" hidden></div>
+
+    <nav class="choices" aria-label="들어갈 화면 고르기">
+      <a class="choice" href="order.html?table=3">
+        <span class="choice-who">손님</span>
+        <span class="choice-title">주문하기</span>
+        <span class="choice-desc">알레르기를 고르고 메뉴판을 보며 주문해요. 3번 테이블 QR로 들어온 것처럼 열려요.</span>
+        <span class="choice-go">손님 화면 열기</span>
+      </a>
+      <a class="choice owner" href="owner.html">
+        <span class="choice-who">사장님</span>
+        <span class="choice-title">주문 받기</span>
+        <span class="choice-desc">들어온 주문과 손님의 알레르기를 실시간으로 확인해요.</span>
+        <span class="choice-code">체험용 가게 코드 <code>gagae1111</code></span>
+        <span class="choice-go">사장님 화면 열기</span>
+      </a>
+    </nav>
+
+    <section class="panel try">
+      <h2>이렇게 체험해 보세요</h2>
+      <ol>
+        <li>이 페이지를 창 두 개(또는 휴대폰과 노트북)에서 열어요.</li>
+        <li>한쪽은 <b>사장님</b>으로 들어가 가게 코드 <code>gagae1111</code>을 넣어요.</li>
+        <li>다른 쪽은 <b>손님</b>으로 들어가 알레르기(예: 땅콩)를 고르고 쫄면과 떡볶이를 주문해요.</li>
+        <li>몇 초 안에 사장님 화면에 주문이 뜨고, 알레르기 주문은 빨간 테두리로 맨 위에 와요.</li>
+        <li>사장님이 "확인했어요 → 조리 완료"를 누르면 손님 화면의 주문 상태도 바뀌어요.</li>
+      </ol>
+      <p class="hint">체험용 코드는 과제 시연을 위해 공개한 것이에요. 주문은 24시간 뒤 자동으로 지워지니 실제 개인정보는 넣지 마세요.</p>
+    </section>
 
     <footer>
-      <p id="storeNote"></p>
-      <p data-i18n="footer"></p>
-      <p data-i18n="imgNote"></p>
+      <p>인공지능 프로그래밍 중간고사 과제 · 정혜린</p>
+      <p><a href="https://github.com/gPflsdla/ingong-project">GitHub 저장소와 README</a> · <a href="tests/">판정 테스트 페이지</a></p>
     </footer>
   </div>
-
-  <script src="js/restrictions.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/dictionary.js"></script>
-  <script src="js/matcher.js"></script>
-  <script src="js/menu.js"></script>
-  <script src="js/app.js"></script>
 </body>
 </html>

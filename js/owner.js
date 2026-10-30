@@ -171,6 +171,11 @@
     $("loginMsg").textContent = msg || "";
     $("code").value = ""; $("code").focus();
   }
+  // 12-11: 체험용 코드를 넣고 바로 들어가기
+  $("demoFill").addEventListener("click", function () {
+    $("code").value = "gagae1111";
+    $("loginForm").requestSubmit ? $("loginForm").requestSubmit() : $("loginForm").dispatchEvent(new Event("submit", { cancelable: true }));
+  });
   $("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
     code = $("code").value.trim();

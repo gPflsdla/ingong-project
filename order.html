@@ -1,0 +1,137 @@
+<!doctype html>
+<!-- 손님 주문 화면 (12-11에서 index.html → order.html로 옮김. QR 주소: order.html?table=3) -->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SafeOrder</title>
+  <link rel="icon" href="images/logo-safeorder.svg" type="image/svg+xml">
+  <meta name="description" content="Order with your allergies and diet already on the ticket.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <!-- 머리말: 가게 이름, 앱 이름, 언어 전환 (PRD #1, #6, #4-7) -->
+    <header class="site-header">
+      <div class="title-row">
+        <a class="brand" href="./" title="처음 화면"><img src="images/logo-safeorder.svg" alt="" width="24" height="24">SafeOrder</a>
+        <div class="lang" role="group" aria-label="Language / 언어">
+          <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
+          <button type="button" data-lang="en" aria-pressed="false">English</button>
+        </div>
+      </div>
+      <!-- 가게 로고와 이름 (12-10) -->
+      <div class="store">
+        <img class="store-logo" src="images/logo-hallabunsik.png" alt="" width="76" height="76">
+        <div>
+          <h1 id="storeName"></h1>
+          <p class="store-desc" id="storeDesc"></p>
+        </div>
+      </div>
+      <p class="tagline" data-i18n="tagline"></p>
+    </header>
+
+    <!-- 12단계: 주문 서버에 연결이 안 될 때 안내 (PRD #7, Todo 12-2) -->
+    <p class="server-note" id="serverNote" role="status" data-i18n="serverDown" hidden></p>
+
+    <!-- 1단계 화면: 못 먹는 것 고르기 (PRD #4-1, Todo 8-3). 다 고르면 접혀서 고른 것만 한 줄로 보임 -->
+    <details class="panel rules" id="rulesBox">
+      <summary>
+        <span class="step" aria-hidden="true">1</span>
+        <span class="rules-text">
+          <span class="rules-title" data-i18n="myRules"></span>
+          <span class="summary" id="ruleSummary"></span>
+        </span>
+        <span class="rules-edit" data-i18n="edit"></span>
+      </summary>
+      <div class="rules-body">
+        <div class="chipset">
+          <span class="lbl" data-i18n="allergies"></span>
+          <div class="chips" id="allergyChips"></div>
+        </div>
+        <div class="chipset">
+          <span class="lbl" data-i18n="diet"></span>
+          <div class="chips" id="dietChips"></div>
+        </div>
+        <p class="hint" data-i18n="rulesHint"></p>
+        <button type="button" class="btn primary big" id="rulesDone" data-i18n="rulesDone"></button>
+      </div>
+    </details>
+
+    <!-- 11단계: 내 주문 상태 (PRD #4-6, Todo 11-5) -->
+    <section class="panel my-orders" id="myOrders" aria-live="polite" hidden>
+      <h2 data-i18n="myOrders"></h2>
+      <ul id="myOrderList"></ul>
+    </section>
+
+    <!-- 2단계 화면: 메뉴 고르기 (PRD #4-2, Todo 8-2, 8-4, 8-5) -->
+    <main id="menuArea">
+      <h2 class="step-title"><span class="step" aria-hidden="true">2</span><span data-i18n="stepMenu"></span></h2>
+      <div class="menu-tools">
+        <nav class="cats" id="cats" aria-label="Categories"></nav>
+      </div>
+      <label class="only-safe" id="onlySafeWrap"><input type="checkbox" id="onlySafe" role="switch"> <span data-i18n="onlySafe"></span></label>
+      <p class="hint" id="menuHint"></p>
+      <div id="menu"></div>
+    </main>
+
+    <!-- 9단계: 아래 고정 장바구니 막대 -->
+    <div class="cart-bar" id="cartBar" hidden>
+      <span id="cartSum"></span>
+      <button type="button" class="btn primary" id="openCart" data-i18n="viewCart"></button>
+    </div>
+
+    <!-- 9단계: 주문 확인 화면 -->
+    <div class="sheet-bg" id="sheetBg" hidden></div>
+    <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+      <div class="sheet-head">
+        <h2 id="sheetTitle" data-i18n="cartTitle"></h2>
+        <button type="button" class="btn" id="closeCart" data-i18n="close"></button>
+      </div>
+      <div class="sheet-body">
+        <!-- 자리 번호: 손님이 직접 넣음. QR 주소에 번호가 있으면 미리 채워 둠 (Todo 9-2 변경) -->
+        <div class="field">
+          <label for="tableNum" data-i18n="table"></label>
+          <div class="table-input">
+            <input id="tableNum" type="number" inputmode="numeric" min="1" max="50" step="1" autocomplete="off">
+            <span class="unit" data-i18n="tableUnit"></span>
+          </div>
+          <p class="hint" id="tableHint"></p>
+        </div>
+        <ul class="cart-list" id="cartList"></ul>
+        <p class="cart-total"><span data-i18n="total"></span> <b id="cartTotal"></b></p>
+        <div class="send-box" id="sendBox"></div>
+        <div class="bad-box" id="badBox" hidden>
+          <p class="bad-title" data-i18n="badWarnTitle"></p>
+          <ul id="badList"></ul>
+          <label class="ack"><input type="checkbox" id="ack"> <span data-i18n="badWarnAck"></span></label>
+        </div>
+        <p class="warn-note" id="warnNote" data-i18n="warnNote" hidden></p>
+        <div class="field">
+          <label for="memo" data-i18n="memo"></label>
+          <textarea id="memo" rows="2" maxlength="200"></textarea>
+        </div>
+        <p class="form-msg" id="formMsg" role="status"></p>
+        <button type="button" class="btn primary big" id="placeOrder" data-i18n="placeOrder"></button>
+      </div>
+    </section>
+    <div class="toast" id="toast" hidden></div>
+
+    <footer>
+      <p id="storeNote"></p>
+      <p data-i18n="footer"></p>
+      <p data-i18n="imgNote"></p>
+    </footer>
+  </div>
+
+  <script src="js/restrictions.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/dictionary.js"></script>
+  <script src="js/matcher.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
