@@ -29,7 +29,7 @@
 
   function chipHTML(kind, item, on) {
     return '<button type="button" class="chip" data-kind="' + kind + '" data-id="' + item.id + '" aria-pressed="' + on + '">' +
-      esc(label(item)) + ' <span class="k">' + esc(label(item, LL.other())) + "</span></button>";
+      esc(label(item)) + "</button>";
   }
   function renderRules() {
     $("dietChips").innerHTML = LL.DIETS.map(function (d) { return chipHTML("diet", d, prefs.diets.indexOf(d.id) !== -1); }).join("");
@@ -49,6 +49,11 @@
     renderRules();
     renderMenu();
     if (!$("sheet").hidden) renderSheet();
+  });
+  // "다 골랐어요": 칸을 접고 메뉴로 이동
+  $("rulesDone").addEventListener("click", function () {
+    $("rulesBox").open = false;
+    $("menuArea").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   // ---------- 메뉴 판정 (Todo 8-4) ----------
@@ -87,20 +92,23 @@
   var openId = null;
   function price(n) { return LL.t("won", { price: n.toLocaleString("ko-KR") }); }
 
+  // 메뉴 카드: 그림 | 이름·가격 / 한 줄 설명 / 판정(못 먹으면 걸린 원재료까지) | + 버튼
+  // 12단계에서 정리: 다른 언어 이름, 색 점, 취소선을 카드에서 빼고 판정은 한 줄로 모음
   function cardHTML(item) {
     var j = judge(item), v = j.verdict === "unknown" ? "warn" : j.verdict;
-    var badge = v === "none" ? "" : '<span class="badge ' + v + '">' + esc(LL.t("b_" + v)) + "</span>";
-    // 카드에 바로 보이는 짧은 이유: 걸린 원재료 이름들
     var terms = [];
     j.reasons.forEach(function (r) { r.terms.forEach(function (t) { if (terms.indexOf(t) === -1) terms.push(t); }); });
-    var short = terms.length ? '<span class="short ' + v + '" lang="ko">' + esc(terms.join(" · ")) + "</span>" : "";
+    var verdict = v === "none" ? "" : v === "ok"
+      ? '<span class="verdict ok">✓ ' + esc(LL.t("b_ok")) + "</span>"
+      : '<span class="verdict ' + v + '"><b>' + esc(LL.t("b_" + v)) + "</b>" + (terms.length ? ' <span lang="ko">' + esc(terms.join(", ")) + "</span>" : "") + "</span>";
     var open = openId === item.id;
     var desc = LL.lang === "ko" ? item.descKo : item.descEn;
     var intro = LL.lang === "ko" ? item.introKo : item.introEn;
     var detail = !open ? "" :
       '<div class="detail">' +
         (item.img ? '<img class="detail-img" src="' + esc(item.img) + '" alt="' + esc(label(item)) + '" loading="lazy">' : "") +
-        (intro ? "<h4>" + esc(LL.t("about")) + '</h4><p class="intro">' + esc(intro) + "</p>" : "") +
+        '<p class="alt-name">' + esc(label(item)) + " · " + esc(label(item, LL.other())) + "</p>" +
+        (intro ? '<p class="intro">' + esc(intro) + "</p>" : "") +
         (j.reasons.length ? "<h4>" + esc(LL.t("whyTitle")) + '</h4><ul class="reasons">' + j.reasons.map(function (r) {
           var p = reasonParts(r);
           return '<li class="reason ' + r.level + '"><span class="dot" aria-hidden="true"></span><div><div class="what">' + esc(p.title) + " " +
@@ -113,9 +121,11 @@
     return '<article class="item ' + v + (open ? " open" : "") + '" data-id="' + item.id + '">' +
       '<button type="button" class="item-head' + (item.img ? " has-img" : "") + '" aria-expanded="' + open + '">' +
         (item.img ? '<img class="thumb" src="' + esc(item.img) + '" alt="" loading="lazy">' : "") +
-        '<span class="item-main"><span class="item-name">' + esc(label(item)) + "</span>" +
-        '<span class="item-sub">' + esc(label(item, LL.other())) + (desc ? " · " + esc(desc) : "") + "</span>" +
-        '<span class="item-meta"><span class="price">' + esc(price(item.price)) + "</span>" + badge + "</span>" + short + "</span>" +
+        '<span class="item-main">' +
+          '<span class="item-top"><span class="item-name">' + esc(label(item)) + '</span><span class="price">' + esc(price(item.price)) + "</span></span>" +
+          (desc ? '<span class="item-sub">' + esc(desc) + "</span>" : "") +
+          verdict +
+        "</span>" +
       "</button>" +
       '<button type="button" class="add" data-add="' + item.id + '" aria-label="' + esc(LL.t("add") + " " + label(item)) + '">' +
         (inCart ? '<span class="qty">' + inCart + "</span>" : '<span aria-hidden="true">+</span>') + "</button>" +
@@ -138,6 +148,7 @@
     $("menu").innerHTML = html;
     $("menuHint").textContent = !hasPrefs() ? LL.t("noRulesHint") : hiddenCount ? LL.t("hidden", { n: hiddenCount }) : "";
     $("menuHint").hidden = !$("menuHint").textContent;
+    $("onlySafeWrap").hidden = !hasPrefs();   // 고른 것이 없으면 이 스위치는 의미가 없어서 숨김
   }
   $("menu").addEventListener("click", function (e) {
     var add = e.target.closest("[data-add]");

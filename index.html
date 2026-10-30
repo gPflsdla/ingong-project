@@ -31,22 +31,27 @@
     <!-- 12단계: 주문 서버에 연결이 안 될 때 안내 (PRD #7, Todo 12-2) -->
     <p class="server-note" id="serverNote" role="status" data-i18n="serverDown" hidden></p>
 
-    <!-- 내 알레르기·식단 (PRD #4-1, Todo 8-3): LabelLens 2단계 선택 버튼을 접는 칸으로 옮김 -->
+    <!-- 1단계 화면: 못 먹는 것 고르기 (PRD #4-1, Todo 8-3). 다 고르면 접혀서 고른 것만 한 줄로 보임 -->
     <details class="panel rules" id="rulesBox">
       <summary>
-        <span class="rules-title" data-i18n="myRules"></span>
-        <span class="summary" id="ruleSummary"></span>
+        <span class="step" aria-hidden="true">1</span>
+        <span class="rules-text">
+          <span class="rules-title" data-i18n="myRules"></span>
+          <span class="summary" id="ruleSummary"></span>
+        </span>
+        <span class="rules-edit" data-i18n="edit"></span>
       </summary>
       <div class="rules-body">
-        <div class="chipset">
-          <span class="lbl" data-i18n="diet"></span>
-          <div class="chips" id="dietChips"></div>
-        </div>
         <div class="chipset">
           <span class="lbl" data-i18n="allergies"></span>
           <div class="chips" id="allergyChips"></div>
         </div>
+        <div class="chipset">
+          <span class="lbl" data-i18n="diet"></span>
+          <div class="chips" id="dietChips"></div>
+        </div>
         <p class="hint" data-i18n="rulesHint"></p>
+        <button type="button" class="btn primary big" id="rulesDone" data-i18n="rulesDone"></button>
       </div>
     </details>
 
@@ -56,13 +61,14 @@
       <ul id="myOrderList"></ul>
     </section>
 
-    <!-- 메뉴판 (PRD #4-2, Todo 8-2, 8-4, 8-5) -->
-    <main>
+    <!-- 2단계 화면: 메뉴 고르기 (PRD #4-2, Todo 8-2, 8-4, 8-5) -->
+    <main id="menuArea">
+      <h2 class="step-title"><span class="step" aria-hidden="true">2</span><span data-i18n="stepMenu"></span></h2>
       <div class="menu-tools">
         <nav class="cats" id="cats" aria-label="Categories"></nav>
-        <label class="only-safe"><input type="checkbox" id="onlySafe"> <span data-i18n="onlySafe"></span></label>
       </div>
-      <p class="hint center" id="menuHint"></p>
+      <label class="only-safe" id="onlySafeWrap"><input type="checkbox" id="onlySafe" role="switch"> <span data-i18n="onlySafe"></span></label>
+      <p class="hint" id="menuHint"></p>
       <div id="menu"></div>
     </main>
 

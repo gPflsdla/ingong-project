@@ -11,15 +11,15 @@ window.LL = window.LL || {};
 
   var STR = {
     en: {
-      tagline: "Tell us what you avoid once. We'll mark the menu for you and pass it on to the kitchen with your order.",
-      myRules: "My allergies & diet", rulesHint: "Saved on this phone only. It is sent to the restaurant only with your order.",
-      diet: "Diet", allergies: "Allergies (Korean labeling list)",
-      checkingFor: "Checking for: {list}", nothingSelected: "Nothing selected yet. Tap what you avoid.", allergySuffix: " allergy",
+      tagline: "Pick what you can't eat. We'll flag dishes that don't fit and tell the kitchen when you order.",
+      myRules: "What can't you eat?", rulesHint: "Saved on this phone only. It is sent to the restaurant only with your order.",
+      diet: "Diet", allergies: "Allergies",
+      checkingFor: "{list}", nothingSelected: "Tap your allergies or diet below.", allergySuffix: " allergy",
       onlySafe: "Show only dishes I can eat", menuTitle: "Menu", won: "{price} won",
       // 메뉴 판정 배지
       b_bad: "Can't eat", b_warn: "Check first", b_ok: "OK for you", b_none: "",
       hidden: "{n} dishes hidden because they don't fit your rules.",
-      ingredients: "Ingredients", whyTitle: "Why", noRulesHint: "Pick your allergies or diet above to see which dishes fit.",
+      ingredients: "Ingredients", whyTitle: "Why", noRulesHint: "Pick what you can't eat in step 1 to see which dishes fit.",
       showDetail: "Details", hideDetail: "Close",
       facilityNote: "Shared kitchen",
       // 이유
@@ -46,18 +46,19 @@ window.LL = window.LL || {};
       orderSent: "Order #{id} sent to the kitchen with your allergy info.",
       sendFailed: "Couldn't send your order. Check your connection and try again, or tell the staff.",
       close: "Close",
+      edit: "Edit", rulesDone: "Done, show the menu", stepMenu: "Choose your dishes",
       about: "About this dish", imgNote: "Menu pictures are illustrations and may look different from the real dish.",
       serverDown: "Can't reach the ordering server right now. You can still use the menu and allergy marks. Please order with the staff for now."
     },
     ko: {
-      tagline: "피해야 할 것을 한 번만 알려 주세요. 메뉴판에 표시해 드리고, 주문할 때 주방에도 함께 전해 드려요.",
-      myRules: "내 알레르기·식단", rulesHint: "이 휴대폰에만 저장돼요. 식당에는 주문할 때만 함께 전달돼요.",
-      diet: "식단", allergies: "알레르기 (한국 표시 기준)",
-      checkingFor: "확인 중: {list}", nothingSelected: "아직 고른 것이 없어요. 피하는 것을 눌러 주세요.", allergySuffix: " 알레르기",
+      tagline: "못 먹는 것을 고르면 먹을 수 없는 메뉴를 알려 드리고, 주문할 때 주방에도 전해 드려요.",
+      myRules: "못 먹는 것 고르기", rulesHint: "이 휴대폰에만 저장돼요. 식당에는 주문할 때만 함께 전달돼요.",
+      diet: "식단", allergies: "알레르기",
+      checkingFor: "{list}", nothingSelected: "아래에서 알레르기나 식단을 눌러 고르세요.", allergySuffix: " 알레르기",
       onlySafe: "먹을 수 있는 메뉴만 보기", menuTitle: "메뉴", won: "{price}원",
       b_bad: "못 먹어요", b_warn: "확인 필요", b_ok: "괜찮아요", b_none: "",
       hidden: "내 조건에 맞지 않는 메뉴 {n}개를 숨겼어요.",
-      ingredients: "원재료", whyTitle: "이유", noRulesHint: "위에서 알레르기나 식단을 고르면 먹을 수 있는 메뉴를 표시해 드려요.",
+      ingredients: "원재료", whyTitle: "이유", noRulesHint: "1번에서 못 먹는 것을 고르면 메뉴마다 먹을 수 있는지 표시돼요.",
       showDetail: "자세히", hideDetail: "닫기",
       facilityNote: "같은 주방",
       r_allergy_bad: "{name} 들어 있음", r_allergy_bad_why: "알레르기로 고른 항목이에요.",
@@ -82,6 +83,7 @@ window.LL = window.LL || {};
       orderSent: "{id}번 주문이 알레르기 정보와 함께 주방에 전달됐어요.",
       sendFailed: "주문을 보내지 못했어요. 인터넷 연결을 확인하고 다시 시도하거나 직원에게 말씀해 주세요.",
       close: "닫기",
+      edit: "바꾸기", rulesDone: "다 골랐어요, 메뉴 보기", stepMenu: "메뉴 고르기",
       about: "음식 소개", imgNote: "메뉴 그림은 실제 음식과 다를 수 있어요.",
       serverDown: "지금 주문 서버에 연결할 수 없어요. 메뉴판과 알레르기 표시는 그대로 쓸 수 있어요. 주문은 직원에게 말씀해 주세요."
     }
