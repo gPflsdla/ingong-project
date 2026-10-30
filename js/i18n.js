@@ -46,6 +46,7 @@ window.LL = window.LL || {};
       orderSent: "Order #{id} sent to the kitchen with your allergy info.",
       sendFailed: "Couldn't send your order. Check your connection and try again, or tell the staff.",
       close: "Close",
+      about: "About this dish", imgNote: "Menu pictures are illustrations and may look different from the real dish.",
       serverDown: "Can't reach the ordering server right now. You can still use the menu and allergy marks. Please order with the staff for now."
     },
     ko: {
@@ -81,6 +82,7 @@ window.LL = window.LL || {};
       orderSent: "{id}번 주문이 알레르기 정보와 함께 주방에 전달됐어요.",
       sendFailed: "주문을 보내지 못했어요. 인터넷 연결을 확인하고 다시 시도하거나 직원에게 말씀해 주세요.",
       close: "닫기",
+      about: "음식 소개", imgNote: "메뉴 그림은 실제 음식과 다를 수 있어요.",
       serverDown: "지금 주문 서버에 연결할 수 없어요. 메뉴판과 알레르기 표시는 그대로 쓸 수 있어요. 주문은 직원에게 말씀해 주세요."
     }
   };

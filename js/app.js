@@ -96,8 +96,11 @@
     var short = terms.length ? '<span class="short ' + v + '" lang="ko">' + esc(terms.join(" · ")) + "</span>" : "";
     var open = openId === item.id;
     var desc = LL.lang === "ko" ? item.descKo : item.descEn;
+    var intro = LL.lang === "ko" ? item.introKo : item.introEn;
     var detail = !open ? "" :
       '<div class="detail">' +
+        (item.img ? '<img class="detail-img" src="' + esc(item.img) + '" alt="' + esc(label(item)) + '" loading="lazy">' : "") +
+        (intro ? "<h4>" + esc(LL.t("about")) + '</h4><p class="intro">' + esc(intro) + "</p>" : "") +
         (j.reasons.length ? "<h4>" + esc(LL.t("whyTitle")) + '</h4><ul class="reasons">' + j.reasons.map(function (r) {
           var p = reasonParts(r);
           return '<li class="reason ' + r.level + '"><span class="dot" aria-hidden="true"></span><div><div class="what">' + esc(p.title) + " " +
@@ -108,13 +111,14 @@
       "</div>";
     var inCart = cart[item.id] || 0;
     return '<article class="item ' + v + (open ? " open" : "") + '" data-id="' + item.id + '">' +
-      '<button type="button" class="item-head" aria-expanded="' + open + '">' +
+      '<button type="button" class="item-head' + (item.img ? " has-img" : "") + '" aria-expanded="' + open + '">' +
+        (item.img ? '<img class="thumb" src="' + esc(item.img) + '" alt="" loading="lazy">' : "") +
         '<span class="item-main"><span class="item-name">' + esc(label(item)) + "</span>" +
-        '<span class="item-sub">' + esc(label(item, LL.other())) + (desc ? " · " + esc(desc) : "") + "</span>" + short + "</span>" +
-        '<span class="item-side"><span class="price">' + esc(price(item.price)) + "</span>" + badge + "</span>" +
+        '<span class="item-sub">' + esc(label(item, LL.other())) + (desc ? " · " + esc(desc) : "") + "</span>" +
+        '<span class="item-meta"><span class="price">' + esc(price(item.price)) + "</span>" + badge + "</span>" + short + "</span>" +
       "</button>" +
       '<button type="button" class="add" data-add="' + item.id + '" aria-label="' + esc(LL.t("add") + " " + label(item)) + '">' +
-        (inCart ? '<span class="qty">' + inCart + "</span>" : "+ " + esc(LL.t("add"))) + "</button>" +
+        (inCart ? '<span class="qty">' + inCart + "</span>" : '<span aria-hidden="true">+</span>') + "</button>" +
       detail + "</article>";
   }
 

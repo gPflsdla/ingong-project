@@ -134,8 +134,14 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .item.bad .item-name { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--bad); text-decoration-thickness: 1.5px; }
 .item-head {
   all: unset; box-sizing: border-box; width: 100%; cursor: pointer;
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 15px 16px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 15px 8px 15px 15px;
 }
+/* 12-6: 메뉴 그림 (작은 그림은 카드 왼쪽, 큰 그림은 자세히 열었을 때) */
+.item-head.has-img { grid-template-columns: auto minmax(0, 1fr); }
+.thumb { width: 64px; height: 64px; border-radius: 14px; object-fit: cover; background: var(--accent-soft); align-self: start; }
+.item.bad .thumb { filter: grayscale(0.7); opacity: 0.7; }
+.detail-img { width: min(100%, 260px); aspect-ratio: 1; object-fit: cover; border-radius: 18px; margin: 14px auto 0; display: block; background: var(--accent-soft); }
+.intro { margin: 0; font-size: 14.5px; line-height: 1.75; }
 .item-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .item-name { font-weight: 600; font-size: 16.5px; display: inline-flex; align-items: center; gap: 8px; }
 /* 판정 색 점: 이름 앞의 작은 점으로 판정을 조용히 알려 줌 */
@@ -147,7 +153,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .short { font-size: 12.5px; font-weight: 600; }
 .short.bad { color: var(--bad); }
 .short.warn { color: var(--warn); }
-.item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 4px; }
 .price { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .badge { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
 .badge.bad { background: var(--bad-soft); color: var(--bad); }
@@ -177,13 +183,14 @@ footer p { margin: 0 0 4px; }
    9단계: 담기 버튼, 장바구니 막대, 주문 확인 화면
    ========================================================= */
 .add {
-  font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
-  align-self: center; margin-right: 14px; min-width: 66px; padding: 8px 12px;
-  border-radius: 999px; border: 1px solid var(--ink); background: transparent; color: var(--ink);
+  font: inherit; font-size: 20px; font-weight: 500; line-height: 1; cursor: pointer;
+  align-self: center; margin-right: 14px; width: 42px; height: 42px; padding: 0;
+  border-radius: 50%; border: 1px solid var(--ink); background: transparent; color: var(--ink);
+  display: inline-flex; align-items: center; justify-content: center;
   transition: background 0.15s, color 0.15s;
 }
 .add:hover { background: var(--accent-soft); }
-.add .qty { display: inline-block; min-width: 1.5em; text-align: center; }
+.add .qty { font-size: 16px; font-weight: 700; }
 .item .add:has(.qty) { background: var(--citrus); border-color: var(--citrus); color: #2E2018; }
 .btn {
   font: inherit; font-size: 14px; cursor: pointer; border-radius: 999px; padding: 7px 14px;
