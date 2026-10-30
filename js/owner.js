@@ -142,12 +142,13 @@
       : '<button type="button" class="btn" data-set="confirmed" data-id="' + o.id + '">되돌리기</button>';
     return '<article class="order ' + o.status + (o.hasAllergy ? " has-allergy" : "") + (o._fresh ? " fresh" : "") + '">' +
       '<header><span class="table">' + o.table + '번</span><span class="meta">#' + o.id + " · " + clock(o.createdAt) + " (" + ago(o.createdAt) + ')</span>' +
-      '<span class="status ' + o.status + '">' + STATUS[o.status] + "</span></header>" +
+      '<span class="status ' + o.status + '">' + STATUS[o.status] + "</span>" +
+      // 12-13: 주문 삭제 버튼은 카드 오른쪽 위에 (처음엔 "삭제", 누르면 "한 번 더 누르면 삭제")
+      '<button type="button" class="btn del' + (isArmed("o" + o.id) ? " armed" : "") + '" data-del="' + o.id + '">' +
+        (isArmed("o" + o.id) ? "한 번 더 누르면 삭제" : "삭제") + "</button></header>" +
       alert + '<ul class="items">' + items + "</ul>" +
       (o.memo ? '<p class="memo"><b>요청사항</b> ' + esc(o.memo) + "</p>" : "") +
-      '<div class="actions">' + btn +
-        '<button type="button" class="btn del' + (isArmed("o" + o.id) ? " armed" : "") + '" data-del="' + o.id + '">' +
-        (isArmed("o" + o.id) ? "한 번 더 누르면 지워져요" : "주문 지우기") + "</button></div></article>";
+      '<div class="actions">' + btn + "</div></article>";
   }
 
   function render() {
@@ -168,7 +169,7 @@
       return '<div class="call"><span class="call-table">' + c.table + '번</span><span class="call-what">' + esc(CALL_NAMES[c.kind] || c.kind) +
         '</span><span class="meta">' + ago(c.createdAt) + '</span><button type="button" class="btn primary" data-call="' + c.id + '">처리했어요</button></div>';
     }).join("");
-    $("resetAll").textContent = isArmed("all") ? "한 번 더 누르면 모두 지워져요" : "전체 지우기";
+    $("resetAll").textContent = isArmed("all") ? "한 번 더 누르면 모두 지워져요" : "전체 리셋";
     $("resetAll").classList.toggle("armed", isArmed("all"));
     var nNew = active.filter(function (o) { return o.status === "new"; }).length;
     var nAllergy = active.filter(function (o) { return o.hasAllergy; }).length;
@@ -205,7 +206,7 @@
       if (!isArmed("o" + id)) { arm("o" + id); return; }
       armed = { key: "", until: 0 };
       d.disabled = true;
-      api("DELETE", "/orders/" + id).then(function () { delete orders[id]; render(); toast(id + "번 주문을 지웠어요."); })
+      api("DELETE", "/orders/" + id).then(function () { delete orders[id]; render(); toast(id + "번 주문을 삭제했어요."); })
         .catch(function (err) { d.disabled = false; fail(err, "지우지 못했어요. 다시 눌러 주세요."); });
       return;
     }
@@ -221,7 +222,7 @@
     armed = { key: "", until: 0 };
     $("resetAll").disabled = true;
     api("POST", "/reset", { confirm: "all" }).then(function () {
-      orders = {}; calls = {}; render(); toast("주문과 호출을 모두 지웠어요.");
+      orders = {}; calls = {}; render(); toast("전체 리셋: 주문과 호출을 모두 지웠어요.");
     }).catch(function (err) { fail(err, "지우지 못했어요. 다시 눌러 주세요."); })
       .then(function () { $("resetAll").disabled = false; });
   });
