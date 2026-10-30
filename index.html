@@ -7,7 +7,7 @@
   <meta name="description" content="Order with your allergies and diet already on the ticket.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -80,10 +80,14 @@
         <button type="button" class="btn" id="closeCart" data-i18n="close"></button>
       </div>
       <div class="sheet-body">
+        <!-- 자리 번호: 손님이 직접 넣음. QR 주소에 번호가 있으면 미리 채워 둠 (Todo 9-2 변경) -->
         <div class="field">
-          <label for="tableSel" data-i18n="table"></label>
-          <p class="table-fixed" id="tableFixed" hidden></p>
-          <select id="tableSel"></select>
+          <label for="tableNum" data-i18n="table"></label>
+          <div class="table-input">
+            <input id="tableNum" type="number" inputmode="numeric" min="1" max="50" step="1" autocomplete="off">
+            <span class="unit" data-i18n="tableUnit"></span>
+          </div>
+          <p class="hint" id="tableHint"></p>
         </div>
         <ul class="cart-list" id="cartList"></ul>
         <p class="cart-total"><span data-i18n="total"></span> <b id="cartTotal"></b></p>

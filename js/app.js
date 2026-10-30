@@ -178,23 +178,30 @@
     renderMenu(); renderCartBar();
   }
 
-  // 테이블 번호 (9-2): QR 주소의 ?table=3 을 읽고, 없으면 손님이 고름
-  var TABLES = 12;
-  var tableFromUrl = (function () {
-    var n = parseInt(new URLSearchParams(location.search).get("table"), 10);
-    return n >= 1 && n <= TABLES ? n : null;
+  // 자리 번호 (9-2 → 12단계에서 변경): 손님이 직접 넣음
+  // QR 주소에 ?table=3 이 있으면 미리 채워 두고, 다른 자리라면 고칠 수 있음. 넣은 번호는 이 탭에 기억함
+  var TABLES = 50;   // 서버도 1~50만 받음
+  var TABLE_KEY = "safeorder.table.v1";
+  function validTable(n) { n = parseInt(n, 10); return n >= 1 && n <= TABLES ? n : null; }
+  var tableFromUrl = validTable(new URLSearchParams(location.search).get("table"));
+  (function () {
+    var saved = null;
+    try { saved = validTable(sessionStorage.getItem(TABLE_KEY)); } catch (e) {}
+    var first = saved || tableFromUrl;
+    if (first) $("tableNum").value = first;
   })();
+  $("tableNum").addEventListener("input", function () {
+    var n = validTable(this.value);
+    try { if (n) sessionStorage.setItem(TABLE_KEY, String(n)); } catch (e) {}
+    $("tableNum").classList.toggle("bad", !!this.value && !n);
+    if (n && $("formMsg").textContent === LL.t("needTable")) $("formMsg").textContent = "";
+    renderTable();
+  });
   function renderTable() {
-    $("tableFixed").hidden = !tableFromUrl;
-    $("tableSel").hidden = !!tableFromUrl;
-    if (tableFromUrl) { $("tableFixed").textContent = LL.t("tableFromQr", { n: tableFromUrl }); return; }
-    var cur = $("tableSel").value;
-    var opts = '<option value="">' + esc(LL.t("pickTable")) + "</option>";
-    for (var i = 1; i <= TABLES; i++) opts += '<option value="' + i + '">' + esc(LL.t("tableFromQr", { n: i })) + "</option>";
-    $("tableSel").innerHTML = opts;
-    $("tableSel").value = cur;
+    var n = currentTable();
+    $("tableHint").textContent = tableFromUrl && n === tableFromUrl ? LL.t("tableHintQr", { n: tableFromUrl }) : LL.t("tableHint", { max: TABLES });
   }
-  function currentTable() { return tableFromUrl || parseInt($("tableSel").value, 10) || null; }
+  function currentTable() { return validTable($("tableNum").value); }
 
   function renderCartBar() {
     var items = cartItems(), n = items.reduce(function (s, c) { return s + c.qty; }, 0);
@@ -274,7 +281,7 @@
     var msg = $("formMsg");
     msg.className = "form-msg err";
     if (!cartItems().length) return;
-    if (!currentTable()) { msg.textContent = LL.t("needTable"); $("tableSel").focus(); return; }
+    if (!currentTable()) { msg.textContent = LL.t("needTable"); $("tableNum").focus(); return; }
     if (!$("badBox").hidden && !$("ack").checked) { msg.textContent = LL.t("needAck"); $("ack").focus(); return; }
     var order = buildOrder();
     window.LL_lastOrder = order;   // 테스트용: 보낸 주문서
