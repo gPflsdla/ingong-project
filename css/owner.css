@@ -4,7 +4,9 @@
    ========================================================= */
 .wrap.wide { max-width: 1280px; padding-bottom: 40px; }
 .owner-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.owner-head h1 { margin: 6px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 32px; }
+.owner-head .store { margin-top: 10px; }
+.owner-head .store-logo { width: 64px; height: 64px; }
+.owner-head h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 32px; }
 .conn { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
 .conn .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
 .conn.ok .dot { background: var(--ok); }

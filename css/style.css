@@ -69,9 +69,13 @@ body {
 
 /* 머리말: 가게 간판 */
 .title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.brand { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.01em; }
-.brand::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
-.site-header h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 9vw, 42px); line-height: 1.15; letter-spacing: -0.01em; margin: 8px 0 0; }
+.title-row { align-items: center; }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.brand img { width: 24px; height: 24px; display: block; }
+/* 가게 로고(12-10): 사장님이 준 원형 로고. 다크 모드에서도 흰 원이 그대로 보이게 둠 */
+.store { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+.store-logo { flex: none; width: 76px; height: 76px; border-radius: 50%; box-shadow: 0 0 0 1px var(--line); background: #fff; }
+.site-header h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 8vw, 38px); line-height: 1.15; letter-spacing: -0.01em; margin: 0; }
 .store-desc { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
 .tagline { margin: 14px 0 0; color: var(--ink); font-size: 15px; max-width: 34em; }
 

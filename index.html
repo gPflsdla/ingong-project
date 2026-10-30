@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>SafeOrder</title>
+  <link rel="icon" href="images/logo-safeorder.svg" type="image/svg+xml">
   <meta name="description" content="Order with your allergies and diet already on the ticket.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,14 +16,18 @@
     <!-- 머리말: 가게 이름, 앱 이름, 언어 전환 (PRD #1, #6, #4-7) -->
     <header class="site-header">
       <div class="title-row">
-        <div>
-          <span class="brand">SafeOrder</span>
-          <h1 id="storeName"></h1>
-          <p class="store-desc" id="storeDesc"></p>
-        </div>
+        <span class="brand"><img src="images/logo-safeorder.svg" alt="" width="24" height="24">SafeOrder</span>
         <div class="lang" role="group" aria-label="Language / 언어">
           <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
           <button type="button" data-lang="en" aria-pressed="false">English</button>
+        </div>
+      </div>
+      <!-- 가게 로고와 이름 (12-10) -->
+      <div class="store">
+        <img class="store-logo" src="images/logo-hallabunsik.png" alt="" width="76" height="76">
+        <div>
+          <h1 id="storeName"></h1>
+          <p class="store-desc" id="storeDesc"></p>
         </div>
       </div>
       <p class="tagline" data-i18n="tagline"></p>
