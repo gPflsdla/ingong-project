@@ -70,8 +70,11 @@ body {
 /* 머리말: 가게 간판 */
 .title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .title-row { align-items: center; }
-.brand { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-.brand img { width: 24px; height: 24px; display: block; }
+.brand { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
+.brand img { width: 30px; height: 30px; display: block; }
+/* 앱 이름 글자(12-12): 동글동글한 Fredoka 소문자 + 파랑. 로고 그림과 함께 한 덩어리로 보이게 */
+.wordmark { font-family: "Fredoka", var(--font-body); font-weight: 700; font-size: 25px; line-height: 1; letter-spacing: -0.01em; color: var(--accent); }
+.brand-sub { font-size: 14px; font-weight: 600; color: var(--muted); padding-left: 10px; margin-left: 2px; border-left: 1px solid var(--line); }
 a.brand { text-decoration: none; }
 /* 가게 로고(12-10): 사장님이 준 원형 로고. 다크 모드에서도 흰 원이 그대로 보이게 둠 */
 .store { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
