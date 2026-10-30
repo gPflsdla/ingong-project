@@ -26,9 +26,17 @@
       <!-- 가게 로고와 이름 (12-10) -->
       <div class="store">
         <img class="store-logo" src="images/logo-hallabunsik.png" alt="" width="76" height="76">
-        <div>
+        <div class="store-text">
           <h1 id="storeName"></h1>
           <p class="store-desc" id="storeDesc"></p>
+        </div>
+        <!-- 12-15: 자리 번호를 가게 이름 오른쪽에서 바로 넣기 (주문 확인·직원 호출 화면의 자리 번호와 같은 값) -->
+        <div class="seat">
+          <label for="seatNum" data-i18n="table"></label>
+          <div class="seat-box">
+            <input id="seatNum" type="number" inputmode="numeric" min="1" max="50" step="1" autocomplete="off" placeholder="?">
+            <span data-i18n="tableUnit"></span>
+          </div>
         </div>
       </div>
       <p class="tagline" data-i18n="tagline"></p>

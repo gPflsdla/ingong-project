@@ -206,8 +206,18 @@
     var first = saved || tableFromUrl;
     if (first) $("tableNum").value = first;
   })();
+  // 12-15: 위쪽 자리 번호 칸(seatNum)과 주문 확인 화면의 자리 번호 칸(tableNum)은 같은 값을 씀
+  $("seatNum").value = $("tableNum").value;
+  $("seatNum").classList.toggle("empty", !$("seatNum").value);
+  $("seatNum").addEventListener("input", function () {
+    $("tableNum").value = this.value;
+    $("tableNum").dispatchEvent(new Event("input"));
+  });
   $("tableNum").addEventListener("input", function () {
     var n = validTable(this.value);
+    if ($("seatNum").value !== this.value) $("seatNum").value = this.value;
+    $("seatNum").classList.toggle("bad", !!this.value && !n);
+    $("seatNum").classList.toggle("empty", !this.value);
     try { if (n) sessionStorage.setItem(TABLE_KEY, String(n)); } catch (e) {}
     $("tableNum").classList.toggle("bad", !!this.value && !n);
     if (n && $("formMsg").textContent === LL.t("needTable")) $("formMsg").textContent = "";

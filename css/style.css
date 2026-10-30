@@ -331,3 +331,23 @@ body.no-scroll { overflow: hidden; }
 .call-tile.sent { opacity: 0.6; cursor: default; }
 .call-sent { font-size: 12px; font-weight: 700; color: var(--accent); }
 .mo-st.deleted { background: var(--mark); color: var(--muted); }
+
+/* 12-15: 가게 이름 오른쪽 자리 번호 칸 */
+.store-text { flex: 1; min-width: 0; }
+.seat { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.seat label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.seat-box { display: flex; align-items: baseline; gap: 3px; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+.seat-box input {
+  width: 58px; font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.2; text-align: center;
+  padding: 4px 4px; border: 1.5px solid var(--accent); border-radius: 12px; background: var(--surface); color: var(--ink);
+  -moz-appearance: textfield; appearance: textfield;
+}
+.seat-box input::-webkit-outer-spin-button, .seat-box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.seat-box input::placeholder { color: var(--accent); opacity: 0.6; }
+.seat-box input.empty { border-style: dashed; background: var(--accent-soft); }
+.seat-box input.bad { border-color: var(--bad); }
+.seat-box input:focus { outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+@media (max-width: 380px) {
+  .store-logo { width: 60px; height: 60px; }
+  .store { gap: 10px; }
+}
