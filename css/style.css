@@ -230,3 +230,14 @@ body.no-scroll { overflow: hidden; }
   background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 8px; font-size: 14px;
   max-width: calc(100% - 32px);
 }
+
+/* 11단계: 내 주문 상태 */
+.my-orders h2 { margin: 0 0 6px; font-size: 16px; }
+.my-orders ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.mo { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.mo > div { display: flex; flex-direction: column; min-width: 0; }
+.mo-items { font-size: 13px; color: var(--muted); }
+.mo-st { flex: none; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+.mo-st.new { background: var(--accent-soft); color: var(--accent); }
+.mo-st.confirmed { background: var(--warn-soft); color: var(--warn); }
+.mo-st.done { background: var(--ok); color: var(--bg); }

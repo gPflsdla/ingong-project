@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>사장님 화면 · SafeOrder</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/owner.css">
+</head>
+<body class="owner">
+  <div class="wrap wide">
+    <!-- 11단계: 사장님 화면 (PRD #4-5) -->
+    <header class="owner-head">
+      <div>
+        <span class="brand">SafeOrder · 사장님 화면</span>
+        <h1 id="storeName"></h1>
+      </div>
+      <div class="conn" id="conn" hidden>
+        <span class="dot" aria-hidden="true"></span><span id="connText"></span>
+        <button type="button" class="btn" id="logoutBtn">나가기</button>
+      </div>
+    </header>
+
+    <!-- 가게 코드 입력 (11-1) -->
+    <section class="panel login" id="login">
+      <h2>가게 코드를 입력하세요</h2>
+      <p class="hint">Cloudflare에 비밀 값(STORE_CODE)으로 넣어 둔 코드예요. 이 기기에만 기억해요.</p>
+      <form id="loginForm">
+        <input type="password" id="code" autocomplete="current-password" aria-label="가게 코드" required>
+        <button type="submit" class="btn primary">주문 받기 시작</button>
+      </form>
+      <p class="form-msg err" id="loginMsg" role="alert"></p>
+    </section>
+
+    <!-- 주문 목록 (11-2 ~ 11-4) -->
+    <main id="board" hidden>
+      <div class="summary-row" id="summaryRow"></div>
+      <section>
+        <h2 class="col-title">들어온 주문 <span class="hint">알레르기 주문이 맨 위에 와요</span></h2>
+        <div class="orders" id="active"></div>
+      </section>
+      <details class="done-box">
+        <summary>조리 완료 <span id="doneCount"></span></summary>
+        <div class="orders" id="done"></div>
+      </details>
+    </main>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="js/restrictions.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/owner.js"></script>
+</body>
+</html>

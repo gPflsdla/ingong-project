@@ -3,6 +3,7 @@
 // 8단계: 메뉴판, 내 알레르기·식단, 메뉴별 판정과 이유 (PRD #4-1, #4-2)
 // 9단계: 장바구니, 테이블 번호, 요청사항, 주문 전 경고 (PRD #4-3)
 // 10단계: 주문을 서버(worker/order-api.js)로 보내기 (PRD #4-4, Todo 10-5)
+// 11단계: 내 주문 상태 보기 (PRD #4-6, Todo 11-5)
 // - 판정은 LabelLens에서 만든 js/matcher.js(성분 사전 + 규칙)를 그대로 씀
 // =========================================================
 (function () {
@@ -288,6 +289,7 @@
       cart = {}; saveCart(); $("memo").value = ""; $("ack").checked = false;
       closeSheet(); renderMenu(); renderCartBar();
       toast(LL.t("orderSent", { id: res.id }));
+      renderMyOrders(); pollMyOrders();
     }).catch(function () {
       msg.className = "form-msg err";
       msg.textContent = LL.t("sendFailed");
@@ -317,6 +319,32 @@
   }
   LL.loadMyOrders = loadMyOrders;
 
+  // ---------- 내 주문 상태 (11-5) ----------
+  // 주문할 때 받은 열쇠(token)로 내 주문의 상태만 볼 수 있음. 조리 완료가 아닌 주문이 있으면 5초마다 확인
+  var myStatus = {};   // { 주문 id: "new" | "confirmed" | "done" }
+  var myTimer = null;
+  function renderMyOrders() {
+    var list = loadMyOrders();
+    $("myOrders").hidden = !list.length;
+    $("myOrderList").innerHTML = list.map(function (o) {
+      var st = myStatus[o.id] || "unknown";
+      var names = o.items.map(function (i) { var m = menuById(i.id); return (m ? label(m) : i.id) + " ×" + i.qty; }).join(", ");
+      return '<li class="mo ' + st + '"><div><b>' + esc(LL.t("orderNo", { id: o.id, table: o.table })) + '</b><span class="mo-items">' + esc(names) + "</span></div>" +
+        '<span class="mo-st ' + st + '">' + esc(LL.t("st_" + st)) + "</span></li>";
+    }).join("");
+  }
+  function pollMyOrders() {
+    clearTimeout(myTimer);
+    var list = loadMyOrders().filter(function (o) { return myStatus[o.id] !== "done"; });
+    if (!list.length) return;
+    Promise.all(list.map(function (o) {
+      return fetch(LL.API_URL + "/orders/" + o.id + "?token=" + encodeURIComponent(o.token))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { if (d) myStatus[o.id] = d.status; })
+        .catch(function () { /* 다음에 다시 확인 */ });
+    })).then(function () { renderMyOrders(); myTimer = setTimeout(pollMyOrders, 5000); });
+  }
+
   var toastTimer;
   function toast(text) {
     var t = $("toast"); t.textContent = text; t.hidden = false;
@@ -325,7 +353,7 @@
 
   // ---------- 언어 전환 ----------
   function renderAll() {
-    LL.applyI18n(); renderStore(); renderRules(); renderCats(); renderMenu(); renderCartBar();
+    LL.applyI18n(); renderStore(); renderRules(); renderCats(); renderMenu(); renderCartBar(); renderMyOrders();
     $("memo").placeholder = LL.t("memoPh");
     if (!$("sheet").hidden) renderSheet();
   }
@@ -336,5 +364,6 @@
   // 처음 온 손님은 알레르기 칸을 펼쳐서 보여 줌
   if (!hasPrefs()) $("rulesBox").open = true;
   renderAll();
+  pollMyOrders();
   document.documentElement.setAttribute("data-app", "ready");
 })();
