@@ -1,8 +1,10 @@
-# LabelLens Korea
+# SafeOrder
 
-> 한국 식품 포장의 원재료명 사진을 찍으면, 내 알레르기와 식단(할랄, 비건 등)에 맞는지 영어로 알려 주는 웹앱
+> 식당 QR 주문 화면에서 내 알레르기·식단을 미리 넣어 두면, 못 먹는 메뉴를 표시해 주고 주문할 때 사장님께 알레르기 정보가 함께 전달되는 웹앱
 
-- 실행 링크: https://gpflsdla.github.io/ingong-project/ (6단계에서 배포 예정)
+> 처음에는 **LabelLens Korea**(식품 라벨 사진 판독기)로 시작했다가 10/30에 주제를 바꿨습니다. 이유는 [PRD 0-1](docs/PRD.md)에 있습니다.
+
+- 실행 링크: https://gpflsdla.github.io/ingong-project/ (13단계에서 배포 예정)
 - 저장소: https://github.com/gPflsdla/ingong-project
 - 과목: 인공지능 프로그래밍 중간고사 과제 (바이브 코딩)
 - 만든 사람: 정혜린
@@ -43,6 +45,8 @@
 ingong-project/
 ├─ README.md
 ├─ docs/            PRD, Todo 리스트
+├─ docs/archive/    주제 전환 전 LabelLens의 PRD, Todo
 ├─ .agents/skills/  이 프로젝트에서 쓰는 스킬
+├─ archive/labellens/ 주제 전환 전 LabelLens 앱 (실행 가능)
 └─ prototype/       0단계 가능성 확인용 시제품
 ```
