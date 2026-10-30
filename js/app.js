@@ -1,6 +1,7 @@
 // =========================================================
 // SafeOrder 손님 화면
 // 8단계: 메뉴판, 내 알레르기·식단, 메뉴별 판정과 이유 (PRD #4-1, #4-2)
+// 9단계: 장바구니, 테이블 번호, 요청사항, 주문 전 경고 (PRD #4-3)
 // - 판정은 LabelLens에서 만든 js/matcher.js(성분 사전 + 규칙)를 그대로 씀
 // =========================================================
 (function () {
@@ -45,6 +46,7 @@
     savePrefs();
     renderRules();
     renderMenu();
+    if (!$("sheet").hidden) renderSheet();
   });
 
   // ---------- 메뉴 판정 (Todo 8-4) ----------
@@ -102,12 +104,16 @@
         }).join("") + "</ul>" : "") +
         "<h4>" + esc(LL.t("ingredients")) + '</h4><p class="ingr" lang="ko">' + markedIngredients(item, j) + "</p>" +
       "</div>";
+    var inCart = cart[item.id] || 0;
     return '<article class="item ' + v + (open ? " open" : "") + '" data-id="' + item.id + '">' +
       '<button type="button" class="item-head" aria-expanded="' + open + '">' +
         '<span class="item-main"><span class="item-name">' + esc(label(item)) + "</span>" +
         '<span class="item-sub">' + esc(label(item, LL.other())) + (desc ? " · " + esc(desc) : "") + "</span>" + short + "</span>" +
         '<span class="item-side"><span class="price">' + esc(price(item.price)) + "</span>" + badge + "</span>" +
-      "</button>" + detail + "</article>";
+      "</button>" +
+      '<button type="button" class="add" data-add="' + item.id + '" aria-label="' + esc(LL.t("add") + " " + label(item)) + '">' +
+        (inCart ? '<span class="qty">' + inCart + "</span>" : "+ " + esc(LL.t("add"))) + "</button>" +
+      detail + "</article>";
   }
 
   function renderMenu() {
@@ -128,6 +134,8 @@
     $("menuHint").hidden = !$("menuHint").textContent;
   }
   $("menu").addEventListener("click", function (e) {
+    var add = e.target.closest("[data-add]");
+    if (add) { addToCart(add.getAttribute("data-add")); return; }
     var head = e.target.closest(".item-head");
     if (!head) return;
     var id = head.parentElement.getAttribute("data-id");
@@ -146,8 +154,143 @@
     document.title = label(LL.STORE) + " · SafeOrder";
   }
 
+  // =========================================================
+  // 9단계: 장바구니와 주문 화면
+  // =========================================================
+  var CART_KEY = "safeorder.cart.v1";
+  var cart = {};   // { 메뉴 id: 수량 }
+  try { cart = JSON.parse(sessionStorage.getItem(CART_KEY) || "{}") || {}; } catch (e) { cart = {}; }
+  function saveCart() { try { sessionStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) { /* 저장이 막혀도 사용 가능 */ } }
+  function menuById(id) { return byId(LL.MENU, id); }
+  function cartItems() {
+    return Object.keys(cart).filter(function (id) { return cart[id] > 0 && menuById(id); })
+      .map(function (id) { var m = menuById(id); return { item: m, qty: cart[id], judge: judge(m) }; });
+  }
+  function cartTotal() { return cartItems().reduce(function (s, c) { return s + c.item.price * c.qty; }, 0); }
+
+  function addToCart(id) {
+    cart[id] = (cart[id] || 0) + 1;
+    saveCart();
+    var m = menuById(id);
+    toast(LL.t(judge(m).verdict === "bad" ? "addedBad" : "added", { name: label(m) }));
+    renderMenu(); renderCartBar();
+  }
+
+  // 테이블 번호 (9-2): QR 주소의 ?table=3 을 읽고, 없으면 손님이 고름
+  var TABLES = 12;
+  var tableFromUrl = (function () {
+    var n = parseInt(new URLSearchParams(location.search).get("table"), 10);
+    return n >= 1 && n <= TABLES ? n : null;
+  })();
+  function renderTable() {
+    $("tableFixed").hidden = !tableFromUrl;
+    $("tableSel").hidden = !!tableFromUrl;
+    if (tableFromUrl) { $("tableFixed").textContent = LL.t("tableFromQr", { n: tableFromUrl }); return; }
+    var cur = $("tableSel").value;
+    var opts = '<option value="">' + esc(LL.t("pickTable")) + "</option>";
+    for (var i = 1; i <= TABLES; i++) opts += '<option value="' + i + '">' + esc(LL.t("tableFromQr", { n: i })) + "</option>";
+    $("tableSel").innerHTML = opts;
+    $("tableSel").value = cur;
+  }
+  function currentTable() { return tableFromUrl || parseInt($("tableSel").value, 10) || null; }
+
+  function renderCartBar() {
+    var items = cartItems(), n = items.reduce(function (s, c) { return s + c.qty; }, 0);
+    $("cartBar").hidden = n === 0;
+    $("cartSum").textContent = LL.t("cartBar", { n: n, total: price(cartTotal()) });
+  }
+
+  // 주문 확인 화면 (9-1, 9-3, 9-4)
+  function renderSheet() {
+    var items = cartItems();
+    $("cartList").innerHTML = items.length ? items.map(function (c) {
+      var v = c.judge.verdict;
+      return '<li class="cart-row ' + v + '"><div class="cr-main"><span class="cr-name">' + esc(label(c.item)) + "</span>" +
+        (v === "bad" || v === "warn" ? '<span class="badge ' + v + '">' + esc(LL.t("b_" + v)) + "</span>" : "") +
+        '<span class="cr-price">' + esc(price(c.item.price * c.qty)) + "</span></div>" +
+        '<div class="stepper"><button type="button" class="btn" data-dec="' + c.item.id + '" aria-label="-">−</button>' +
+        '<span class="qty-num">' + c.qty + '</span><button type="button" class="btn" data-inc="' + c.item.id + '" aria-label="+">+</button>' +
+        '<button type="button" class="btn link" data-del="' + c.item.id + '">' + esc(LL.t("remove")) + "</button></div></li>";
+    }).join("") : '<li class="empty">' + esc(LL.t("empty")) + "</li>";
+    $("cartTotal").textContent = price(cartTotal());
+
+    // 주방에 함께 전달될 내 정보
+    var names = [];
+    LL.DIETS.forEach(function (d) { if (prefs.diets.indexOf(d.id) !== -1) names.push(label(d)); });
+    LL.ALLERGENS.forEach(function (a) { if (prefs.allergies.indexOf(a.id) !== -1) names.push(label(a) + LL.t("allergySuffix")); });
+    $("sendBox").innerHTML = names.length
+      ? '<p class="send-title">' + esc(LL.t("sendsWith")) + '</p><p class="send-list">' + names.map(function (n) { return '<span class="chip on">' + esc(n) + "</span>"; }).join(" ") + "</p>"
+      : '<p class="hint">' + esc(LL.t("noRulesSent")) + "</p>";
+
+    // 못 먹는 메뉴가 담겼으면 한 번 더 경고
+    var bad = items.filter(function (c) { return c.judge.verdict === "bad"; });
+    $("badBox").hidden = !bad.length;
+    $("badList").innerHTML = bad.map(function (c) {
+      var terms = [];
+      c.judge.reasons.forEach(function (r) { if (r.level === "bad") r.terms.forEach(function (t) { if (terms.indexOf(t) === -1) terms.push(t); }); });
+      return "<li><b>" + esc(label(c.item)) + '</b> <span lang="ko">' + esc(terms.join(" · ")) + "</span></li>";
+    }).join("");
+    if (!bad.length) $("ack").checked = false;
+    $("warnNote").hidden = !items.some(function (c) { return c.judge.verdict === "warn"; });
+    renderTable();
+    $("placeOrder").disabled = !items.length;
+  }
+
+  function openSheet() { $("toast").hidden = true; renderSheet(); $("formMsg").textContent = ""; $("sheet").hidden = false; $("sheetBg").hidden = false; document.body.classList.add("no-scroll"); $("closeCart").focus(); }
+  function closeSheet() { $("sheet").hidden = true; $("sheetBg").hidden = true; document.body.classList.remove("no-scroll"); $("openCart").focus(); }
+  $("openCart").addEventListener("click", openSheet);
+  $("closeCart").addEventListener("click", closeSheet);
+  $("sheetBg").addEventListener("click", closeSheet);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("sheet").hidden) closeSheet(); });
+  $("cartList").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var id = b.getAttribute("data-inc") || b.getAttribute("data-dec") || b.getAttribute("data-del");
+    if (b.hasAttribute("data-inc")) cart[id]++;
+    else if (b.hasAttribute("data-dec")) cart[id] = Math.max(0, cart[id] - 1);
+    else delete cart[id];
+    if (cart[id] === 0) delete cart[id];
+    saveCart(); renderSheet(); renderCartBar(); renderMenu();
+  });
+
+  // 주문서 만들기 (10단계에서 서버로 보냄)
+  function buildOrder() {
+    return {
+      store: LL.STORE.id,
+      table: currentTable(),
+      lang: LL.lang,
+      prefs: { diets: prefs.diets.slice(), allergies: prefs.allergies.slice() },
+      memo: $("memo").value.trim().slice(0, 200),
+      items: cartItems().map(function (c) {
+        return { id: c.item.id, qty: c.qty, verdict: c.judge.verdict,
+          terms: c.judge.reasons.reduce(function (a, r) { r.terms.forEach(function (t) { if (a.indexOf(t) === -1) a.push(t); }); return a; }, []) };
+      })
+    };
+  }
+  LL.buildOrder = buildOrder;
+
+  $("placeOrder").addEventListener("click", function () {
+    var msg = $("formMsg");
+    msg.className = "form-msg err";
+    if (!cartItems().length) return;
+    if (!currentTable()) { msg.textContent = LL.t("needTable"); $("tableSel").focus(); return; }
+    if (!$("badBox").hidden && !$("ack").checked) { msg.textContent = LL.t("needAck"); $("ack").focus(); return; }
+    window.LL_lastOrder = buildOrder();   // 테스트용: 보낼 주문서
+    msg.className = "form-msg";
+    msg.textContent = LL.t("notConnected");
+  });
+
+  var toastTimer;
+  function toast(text) {
+    var t = $("toast"); t.textContent = text; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2600);
+  }
+
   // ---------- 언어 전환 ----------
-  function renderAll() { LL.applyI18n(); renderStore(); renderRules(); renderCats(); renderMenu(); }
+  function renderAll() {
+    LL.applyI18n(); renderStore(); renderRules(); renderCats(); renderMenu(); renderCartBar();
+    $("memo").placeholder = LL.t("memoPh");
+    if (!$("sheet").hidden) renderSheet();
+  }
   document.querySelectorAll("[data-lang]").forEach(function (b) {
     b.addEventListener("click", function () { LL.setLang(b.getAttribute("data-lang")); renderAll(); });
   });

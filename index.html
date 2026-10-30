@@ -57,6 +57,44 @@
       <div id="menu"></div>
     </main>
 
+    <!-- 9단계: 아래 고정 장바구니 막대 -->
+    <div class="cart-bar" id="cartBar" hidden>
+      <span id="cartSum"></span>
+      <button type="button" class="btn primary" id="openCart" data-i18n="viewCart"></button>
+    </div>
+
+    <!-- 9단계: 주문 확인 화면 -->
+    <div class="sheet-bg" id="sheetBg" hidden></div>
+    <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+      <div class="sheet-head">
+        <h2 id="sheetTitle" data-i18n="cartTitle"></h2>
+        <button type="button" class="btn" id="closeCart" data-i18n="close"></button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="tableSel" data-i18n="table"></label>
+          <p class="table-fixed" id="tableFixed" hidden></p>
+          <select id="tableSel"></select>
+        </div>
+        <ul class="cart-list" id="cartList"></ul>
+        <p class="cart-total"><span data-i18n="total"></span> <b id="cartTotal"></b></p>
+        <div class="send-box" id="sendBox"></div>
+        <div class="bad-box" id="badBox" hidden>
+          <p class="bad-title" data-i18n="badWarnTitle"></p>
+          <ul id="badList"></ul>
+          <label class="ack"><input type="checkbox" id="ack"> <span data-i18n="badWarnAck"></span></label>
+        </div>
+        <p class="warn-note" id="warnNote" data-i18n="warnNote" hidden></p>
+        <div class="field">
+          <label for="memo" data-i18n="memo"></label>
+          <textarea id="memo" rows="2" maxlength="200"></textarea>
+        </div>
+        <p class="form-msg" id="formMsg" role="status"></p>
+        <button type="button" class="btn primary big" id="placeOrder" data-i18n="placeOrder"></button>
+      </div>
+    </section>
+    <div class="toast" id="toast" hidden></div>
+
     <footer>
       <p id="storeNote"></p>
       <p data-i18n="footer"></p>

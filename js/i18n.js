@@ -28,7 +28,19 @@ window.LL = window.LL || {};
       r_facility: "{name} may be present", r_facility_why: "Made in a kitchen that also handles {name}.",
       r_diet_bad: "Not {diet}", r_diet_bad_why: "Contains {tag}.",
       r_diet_warn: "Check for {diet}", r_diet_warn_why: "Contains {tag}.",
-      footer: "Dish ingredients come from the restaurant. If your allergy is serious, please also tell the staff."
+      footer: "Dish ingredients come from the restaurant. If your allergy is serious, please also tell the staff.",
+      // 9단계: 장바구니와 주문 화면
+      add: "Add", added: "Added {name}", addedBad: "Added {name}. It doesn't fit your rules, so we'll check again before ordering.",
+      cartBar: "{n} items · {total}", viewCart: "Review order",
+      cartTitle: "Your order", table: "Table", pickTable: "Choose your table", tableFromQr: "Table {n}",
+      memo: "Request to the kitchen (optional)", memoPh: "e.g. less spicy, no green onion",
+      sendsWith: "Sent to the kitchen with your order", noRulesSent: "No allergies or diet selected. Only your order will be sent.",
+      badWarnTitle: "These dishes don't fit your rules", badWarnAck: "I know, order anyway (I'll ask the kitchen to change it)",
+      warnNote: "Some dishes need a check. The kitchen will see this.",
+      total: "Total", remove: "Remove", empty: "Your cart is empty.",
+      placeOrder: "Place order", needTable: "Choose your table first.", needAck: "Check the box above to order dishes that don't fit your rules.",
+      notConnected: "Order sending is connected in the next step (order server). Your order wasn't sent.",
+      close: "Close"
     },
     ko: {
       tagline: "피해야 할 것을 한 번만 알려 주세요. 메뉴판에 표시해 드리고, 주문할 때 주방에도 함께 전해 드려요.",
@@ -46,7 +58,18 @@ window.LL = window.LL || {};
       r_facility: "{name} 혼입 가능성", r_facility_why: "{nameEul} 다루는 같은 주방에서 만들어요.",
       r_diet_bad: "{diet} 불가", r_diet_bad_why: "{tag} 포함",
       r_diet_warn: "{diet} 확인 필요", r_diet_warn_why: "{tag} 포함",
-      footer: "메뉴의 원재료는 식당이 알려 준 정보예요. 알레르기가 심하다면 직원에게도 꼭 말씀해 주세요."
+      footer: "메뉴의 원재료는 식당이 알려 준 정보예요. 알레르기가 심하다면 직원에게도 꼭 말씀해 주세요.",
+      add: "담기", added: "{name} 담았어요", addedBad: "{name} 담았어요. 내 조건에 맞지 않는 메뉴라 주문 전에 한 번 더 확인할게요.",
+      cartBar: "{n}개 · {total}", viewCart: "주문 확인",
+      cartTitle: "주문 확인", table: "테이블", pickTable: "테이블을 골라 주세요", tableFromQr: "{n}번 테이블",
+      memo: "주방에 요청사항 (선택)", memoPh: "예: 덜 맵게, 파 빼 주세요",
+      sendsWith: "주문과 함께 주방에 전달돼요", noRulesSent: "고른 알레르기·식단이 없어요. 주문만 전달돼요.",
+      badWarnTitle: "내 조건에 맞지 않는 메뉴가 있어요", badWarnAck: "알고 주문할게요 (주방에 빼 달라고 요청할게요)",
+      warnNote: "확인이 필요한 메뉴가 있어요. 주방에서도 함께 보게 돼요.",
+      total: "합계", remove: "빼기", empty: "장바구니가 비어 있어요.",
+      placeOrder: "주문하기", needTable: "먼저 테이블을 골라 주세요.", needAck: "내 조건에 맞지 않는 메뉴를 주문하려면 위 칸에 체크해 주세요.",
+      notConnected: "주문 보내기는 다음 단계(주문 서버)에서 연결돼요. 아직 주문이 전송되지 않았어요.",
+      close: "닫기"
     }
   };
 
