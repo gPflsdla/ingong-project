@@ -311,7 +311,7 @@
         items: order.items.map(function (i) { return { id: i.id, qty: i.qty }; }) });
       cart = {}; saveCart(); $("memo").value = ""; $("ack").checked = false;
       closeSheet(); renderMenu(); renderCartBar();
-      toast(LL.t("orderSent", { id: res.id }));
+      toast(LL.t("orderSent", { table: order.table }));   // 손님에게는 주문 순서 번호 대신 내 자리 번호로 알려 줌 (12-14)
       renderMyOrders(); pollMyOrders();
     }).catch(function () {
       msg.className = "form-msg err";
@@ -354,13 +354,14 @@
   // 주문할 때 받은 열쇠(token)로 내 주문의 상태만 볼 수 있음. 조리 완료가 아닌 주문이 있으면 5초마다 확인
   var myStatus = {};   // { 주문 id: "new" | "confirmed" | "done" }
   var myTimer = null;
+  function hhmm(ts) { var d = new Date(ts); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
   function renderMyOrders() {
     var list = loadMyOrders();
     $("myOrders").hidden = !list.length;
     $("myOrderList").innerHTML = list.map(function (o) {
       var st = myStatus[o.id] || "unknown";
       var names = o.items.map(function (i) { var m = menuById(i.id); return (m ? label(m) : i.id) + " ×" + i.qty; }).join(", ");
-      return '<li class="mo ' + st + '"><div><b>' + esc(LL.t("orderNo", { id: o.id, table: o.table })) + '</b><span class="mo-items">' + esc(names) + "</span></div>" +
+      return '<li class="mo ' + st + '"><div><b>' + esc(LL.t("orderNo", { table: o.table, time: hhmm(o.at) })) + '</b><span class="mo-items">' + esc(names) + "</span></div>" +
         '<span class="mo-st ' + st + '">' + esc(LL.t("st_" + st)) + "</span></li>";
     }).join("");
   }
