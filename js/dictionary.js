@@ -191,6 +191,12 @@ LL.DICT = [
   ["호박씨", "pumpkin seeds", ""],
   ["치아씨드", "chia seeds", ""],
   ["아마씨", "flaxseed", ""],
+  // 8단계 메뉴를 넣다가 발견: "땅콩가루"가 "콩가루"(대두)로 먼저 잡혀 땅콩을 놓침
+  ["땅콩가루", "peanut powder", "peanut"],
+  ["땅콩소스", "peanut sauce", "peanut"],
+  ["쑥갓", "crown daisy (greens)", ""],
+  ["유부", "fried tofu", "soy"],
+  ["당면", "glass noodles (sweet potato starch)", ""],
   // 채소·버섯·해조
   ["마늘", "garlic", ""],
   ["양파", "onion", ""],

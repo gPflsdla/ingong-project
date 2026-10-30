@@ -1,5 +1,5 @@
 // =========================================================
-// 화면 문구 한국어/영어 (PRD #4-7, Todo 5-6)
+// 화면 문구 한국어/영어 (PRD #4-7) — LabelLens 5-6에서 만든 구조를 재사용하고 문구만 SafeOrder용으로 바꿈
 // - index.html의 data-i18n="키" 요소는 LL.applyI18n()이 바꿈
 // - 자바스크립트에서 만드는 문구는 LL.t("키", { 이름: 값 }) 로 꺼내 씀
 // - 처음에는 브라우저 언어를 따르고, 고른 언어는 이 브라우저에 기억함
@@ -11,97 +11,42 @@ window.LL = window.LL || {};
 
   var STR = {
     en: {
-      tagline: "Snap the ingredients panel (원재료명) on a Korean food package. LabelLens reads the Korean text in your browser and tells you whether it fits your allergies and diet.",
-      step1: "Step 1", step2: "Step 2",
-      rulesTitle: "What do you avoid?", diet: "Diet", allergies: "Allergies (Korean labeling list)",
-      savedHint: "Your choices are saved in this browser only.",
+      tagline: "Tell us what you avoid once. We'll mark the menu for you and pass it on to the kitchen with your order.",
+      myRules: "My allergies & diet", rulesHint: "Saved on this phone only. It is sent to the restaurant only with your order.",
+      diet: "Diet", allergies: "Allergies (Korean labeling list)",
       checkingFor: "Checking for: {list}", nothingSelected: "Nothing selected yet. Tap what you avoid.", allergySuffix: " allergy",
-      labelTitle: "Add the label", openCamera: "Open camera", choosePhoto: "Choose photo",
-      dropHint: "Or drop / paste an image here. Get close to the 원재료명 box for best results.",
-      guide: "Fit the 원재료명 text inside this box", takePhoto: "Take photo", closeCamera: "Close camera",
-      trySample: "Try a sample:", textLabel: "Label text (fix any misread words, results update as you type)",
-      why: "Why", ingredients: "Ingredients we recognized", showMarked: "Show the label text with highlights",
-      colKo: "On the label", colEn: "English", colNotes: "Notes",
-      noIngredients: "No known ingredients found. If the photo was blurry, fix the text on the left.", nothingYet: "Nothing yet.",
-      plantBased: "plant-based", facilityOnly: "shared facility only", noConcern: "no concern",
-      countLine: "{known} of {total} ingredients recognized",
-      unknownItems: "Not in our list (check the label or fix misread words):",
-      footer: "LabelLens matches Korean ingredient names against a built-in dictionary. Text recognition can misread small or blurry print, and some ingredients (flavorings, emulsifiers) do not reveal their source. Always read the label yourself or ask staff when an allergy is serious. Photos never leave your device.",
-      // 판정
-      v_empty: "Waiting for a label", v_empty_p: "Add a photo, open the camera, or try a sample.",
-      v_none: "Pick what you avoid", v_none_p: "Choose a diet or allergy in Step 1 to check this label.",
-      v_unknown: "Couldn't spot any ingredients", v_unknown_p: "We can't say this is safe. Check that the text matches the label, or try a sharper photo.",
-      v_bad: "Not for you", v_bad_p: "This product has ingredients that break your rules.",
-      v_warn: "Check before eating", v_warn_p: "Nothing clearly breaks your rules, but some items need a closer look.",
-      v_ok: "No problems found", v_ok_p: "None of the ingredients we recognized break your rules. Unclear print may hide words, so glance at the label too.",
+      onlySafe: "Show only dishes I can eat", menuTitle: "Menu", won: "{price} won",
+      // 메뉴 판정 배지
+      b_bad: "Can't eat", b_warn: "Check first", b_ok: "OK for you", b_none: "",
+      hidden: "{n} dishes hidden because they don't fit your rules.",
+      ingredients: "Ingredients", whyTitle: "Why", noRulesHint: "Pick your allergies or diet above to see which dishes fit.",
+      showDetail: "Details", hideDetail: "Close",
+      facilityNote: "Shared kitchen",
       // 이유
       r_allergy_bad: "Contains {name}", r_allergy_bad_why: "You marked {name} as an allergy.",
       r_allergy_warn: "May contain {name}", r_allergy_warn_why: "Contains {tag}.",
-      r_facility: "{name} may be present", r_facility_why: "Made in a facility that also handles {name} (cross-contact).",
+      r_facility: "{name} may be present", r_facility_why: "Made in a kitchen that also handles {name}.",
       r_diet_bad: "Not {diet}", r_diet_bad_why: "Contains {tag}.",
       r_diet_warn: "Check for {diet}", r_diet_warn_why: "Contains {tag}.",
-      // 사진·카메라
-      loading: "Getting the Korean reader ready (first time only)…", reading: "Reading Korean text on this device…",
-      readingAi: "Reading the ingredients with AI…",
-      doneAi: "Read with AI. Check the text below against the label and fix anything that looks wrong.",
-      unreadableAi: "AI couldn't find an ingredients list in this photo. Try a closer photo of the 원재료명 box.",
-      aiFallback: "AI text reading isn't available right now, so this device's built-in reader is used instead. It is less accurate on real packages.",
-      aiNote: "Photos you add are sent to Google's AI only to read the text. Your allergy and diet choices stay on this device.",
-      done: "Done. Check the text below and fix any misread words.",
-      unreadable: "Couldn't read Korean text in this photo. Move closer to the 원재료명 box, keep it flat and well lit, and try again.",
-      ocrFailed: "Text recognition couldn't start (it needs an internet connection the first time). You can type or paste the ingredients below instead.",
-      cam_insecure: "The camera only works on the https:// link of this app. Use Choose photo instead.",
-      cam_unsupported: "This browser can't open the camera. Use Choose photo instead.",
-      cam_blocked: "Camera permission was blocked. Allow the camera in your browser settings, or use Choose photo.",
-      cam_nocamera: "No camera was found on this device. Use Choose photo instead.",
-      cam_busy: "The camera is being used by another app. Close it and try again, or use Choose photo.",
-      cam_failed: "The camera couldn't start. Use Choose photo instead.",
-      previewAlt: "The label photo you added"
+      footer: "Dish ingredients come from the restaurant. If your allergy is serious, please also tell the staff."
     },
     ko: {
-      tagline: "한국 식품 포장의 원재료명을 찍으면, 브라우저 안에서 글자를 읽고 내 알레르기와 식단에 맞는지 알려 줘요.",
-      step1: "1단계", step2: "2단계",
-      rulesTitle: "무엇을 피하나요?", diet: "식단", allergies: "알레르기 (한국 표시 기준)",
-      savedHint: "고른 내용은 이 브라우저에만 저장돼요.",
+      tagline: "피해야 할 것을 한 번만 알려 주세요. 메뉴판에 표시해 드리고, 주문할 때 주방에도 함께 전해 드려요.",
+      myRules: "내 알레르기·식단", rulesHint: "이 휴대폰에만 저장돼요. 식당에는 주문할 때만 함께 전달돼요.",
+      diet: "식단", allergies: "알레르기 (한국 표시 기준)",
       checkingFor: "확인 중: {list}", nothingSelected: "아직 고른 것이 없어요. 피하는 것을 눌러 주세요.", allergySuffix: " 알레르기",
-      labelTitle: "라벨 넣기", openCamera: "카메라 켜기", choosePhoto: "사진 고르기",
-      dropHint: "사진을 여기에 끌어다 놓거나 붙여 넣어도 돼요. 원재료명 부분을 가까이 찍으면 더 잘 읽혀요.",
-      guide: "원재료명 글자를 이 틀 안에 맞추세요", takePhoto: "촬영하기", closeCamera: "카메라 닫기",
-      trySample: "예시 라벨:", textLabel: "라벨 글자 (잘못 읽힌 글자는 고쳐 주세요. 고치면 결과가 바로 바뀌어요)",
-      why: "이유", ingredients: "찾은 성분", showMarked: "라벨 원문에서 찾은 성분 보기",
-      colKo: "라벨 표기", colEn: "영어", colNotes: "분류",
-      noIngredients: "아는 성분을 찾지 못했어요. 사진이 흐렸다면 왼쪽 글자를 고쳐 주세요.", nothingYet: "아직 없어요.",
-      plantBased: "식물성", facilityOnly: "같은 제조시설만", noConcern: "해당 없음",
-      countLine: "원재료 {total}개 중 {known}개 인식",
-      unknownItems: "사전에 없는 원재료 (라벨을 확인하거나 잘못 읽힌 글자를 고쳐 주세요):",
-      footer: "LabelLens는 앱에 들어 있는 성분 사전으로 한국어 원재료명을 판정해요. 작거나 흐린 글자는 잘못 읽힐 수 있고, 향료나 유화제처럼 원료를 알 수 없는 성분도 있어요. 알레르기가 심하다면 꼭 라벨을 직접 확인하거나 직원에게 물어보세요. 사진은 기기 밖으로 나가지 않아요.",
-      v_empty: "라벨을 기다리는 중", v_empty_p: "사진을 넣거나, 카메라를 켜거나, 예시 라벨을 눌러 보세요.",
-      v_none: "피하는 것을 골라 주세요", v_none_p: "1단계에서 식단이나 알레르기를 고르면 이 라벨을 확인해요.",
-      v_unknown: "아는 성분을 찾지 못했어요", v_unknown_p: "안전하다고 할 수 없어요. 글자가 라벨과 같은지 확인하거나 더 선명한 사진으로 다시 해 보세요.",
-      v_bad: "먹을 수 없어요", v_bad_p: "내 조건에 맞지 않는 성분이 들어 있어요.",
-      v_warn: "확인이 필요해요", v_warn_p: "확실히 걸리는 성분은 없지만, 다시 확인해야 할 성분이 있어요.",
-      v_ok: "문제 성분을 찾지 못했어요", v_ok_p: "찾은 성분 중에는 내 조건에 걸리는 것이 없어요. 흐린 글자가 있을 수 있으니 라벨도 한번 봐 주세요.",
+      onlySafe: "먹을 수 있는 메뉴만 보기", menuTitle: "메뉴", won: "{price}원",
+      b_bad: "못 먹어요", b_warn: "확인 필요", b_ok: "괜찮아요", b_none: "",
+      hidden: "내 조건에 맞지 않는 메뉴 {n}개를 숨겼어요.",
+      ingredients: "원재료", whyTitle: "이유", noRulesHint: "위에서 알레르기나 식단을 고르면 먹을 수 있는 메뉴를 표시해 드려요.",
+      showDetail: "자세히", hideDetail: "닫기",
+      facilityNote: "같은 주방",
       r_allergy_bad: "{name} 들어 있음", r_allergy_bad_why: "알레르기로 고른 항목이에요.",
       r_allergy_warn: "{name} 들어 있을 수 있음", r_allergy_warn_why: "{tag} 포함",
-      r_facility: "{name} 혼입 가능성", r_facility_why: "{nameEul} 다루는 같은 제조시설에서 만든 제품이에요.",
+      r_facility: "{name} 혼입 가능성", r_facility_why: "{nameEul} 다루는 같은 주방에서 만들어요.",
       r_diet_bad: "{diet} 불가", r_diet_bad_why: "{tag} 포함",
       r_diet_warn: "{diet} 확인 필요", r_diet_warn_why: "{tag} 포함",
-      loading: "한국어 인식을 준비하는 중이에요 (처음 한 번만)…", reading: "기기 안에서 글자를 읽는 중…",
-      readingAi: "AI로 원재료명을 읽는 중…",
-      doneAi: "AI로 읽었어요. 아래 글자가 라벨과 같은지 확인하고 다른 곳은 고쳐 주세요.",
-      unreadableAi: "AI가 이 사진에서 원재료명을 찾지 못했어요. 원재료명 부분을 더 가까이 찍어 주세요.",
-      aiFallback: "지금은 AI 글자 인식을 쓸 수 없어서 기기 안 인식기로 대신 읽어요. 실제 포장 사진에서는 정확도가 낮아요.",
-      aiNote: "넣은 사진은 글자를 읽기 위해서만 구글 AI로 보내져요. 알레르기와 식단 선택은 이 기기 밖으로 나가지 않아요.",
-      done: "다 읽었어요. 아래 글자를 확인하고 잘못 읽힌 곳은 고쳐 주세요.",
-      unreadable: "이 사진에서 한글을 읽지 못했어요. 원재료명 부분에 더 가까이, 평평하게, 밝은 곳에서 다시 찍어 주세요.",
-      ocrFailed: "글자 인식을 시작하지 못했어요 (처음에는 인터넷 연결이 필요해요). 아래에 원재료명을 직접 입력하거나 붙여 넣어도 돼요.",
-      cam_insecure: "카메라는 이 앱의 https:// 주소에서만 켜져요. 대신 사진 고르기를 써 주세요.",
-      cam_unsupported: "이 브라우저에서는 카메라를 켤 수 없어요. 대신 사진 고르기를 써 주세요.",
-      cam_blocked: "카메라 권한이 막혀 있어요. 브라우저 설정에서 카메라를 허용하거나 사진 고르기를 써 주세요.",
-      cam_nocamera: "이 기기에서 카메라를 찾지 못했어요. 대신 사진 고르기를 써 주세요.",
-      cam_busy: "다른 앱이 카메라를 쓰고 있어요. 그 앱을 닫고 다시 해 보거나 사진 고르기를 써 주세요.",
-      cam_failed: "카메라를 켜지 못했어요. 대신 사진 고르기를 써 주세요.",
-      previewAlt: "넣은 라벨 사진"
+      footer: "메뉴의 원재료는 식당이 알려 준 정보예요. 알레르기가 심하다면 직원에게도 꼭 말씀해 주세요."
     }
   };
 
@@ -117,7 +62,7 @@ window.LL = window.LL || {};
       maybeMilk: "유제품일 수 있음", maybeEgg: "계란이 들었을 수 있음", maybeWheat: "대개 밀이 들어감", maybeSoy: "대개 대두로 만듦" }
   };
 
-  var KEY = "labellens.lang.v1";
+  var KEY = "safeorder.lang.v1";
   function initialLang() {
     try { var saved = localStorage.getItem(KEY); if (saved === "ko" || saved === "en") return saved; } catch (e) {}
     return /^ko/i.test(navigator.language || "") ? "ko" : "en";

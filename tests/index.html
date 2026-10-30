@@ -33,6 +33,7 @@
   <script src="../js/dictionary.js"></script>
   <script src="../js/matcher.js"></script>
   <script src="../js/samples.js"></script>
+  <script src="../js/menu.js"></script>
   <script>
   (function () {
     "use strict";
@@ -76,6 +77,19 @@
       { what: "예시: 복숭아 음료 + 비건", text: LL.SAMPLES[2].text, prefs: P(["vegan"]), verdict: "ok" },
       { what: "예시: 복숭아 음료 + 복숭아 알레르기", text: LL.SAMPLES[2].text, prefs: P([], ["peach"]), verdict: "bad", has: ["복숭아"] }
     ];
+
+    // ---------- 8-6: SafeOrder 메뉴 판정 ----------
+    function M(id) { var m = LL.MENU.filter(function (x) { return x.id === id; })[0]; return m.ingredients; }
+    CASES = CASES.concat([
+      { what: "메뉴: 쫄면 + 땅콩 알레르기 (땅콩가루가 콩가루로 잡히면 안 됨)", text: M("jjolmyeon"), prefs: P([], ["peanut"]), verdict: "bad", has: ["땅콩가루"] },
+      { what: "메뉴: 순대 + 할랄 (돼지창자, 돼지피)", text: M("sundae"), prefs: P(["halal"]), verdict: "bad" },
+      { what: "메뉴: 야채김밥 + 할랄 (햄)", text: M("veg-gimbap"), prefs: P(["halal"]), verdict: "bad", has: ["햄"] },
+      { what: "메뉴: 라면 + 할랄 (쇠고기추출물은 확인 필요)", text: M("ramyeon"), prefs: P(["halal"]), verdict: "warn" },
+      { what: "메뉴: 채소김밥 + 비건", text: M("vegan-gimbap"), prefs: P(["vegan"]), verdict: "ok" },
+      { what: "메뉴: 떡볶이 + 비건 (어묵, 멸치육수)", text: M("tteokbokki"), prefs: P(["vegan"]), verdict: "bad", has: ["어묵", "멸치"] },
+      { what: "메뉴: 식혜 + 글루텐 프리 (엿기름=보리)", text: M("sikhye"), prefs: P(["glutenfree"]), verdict: "bad", has: ["엿기름"] },
+      { what: "메뉴: 우동 원재료 모두 사전에 있음", text: M("udon"), prefs: P(["vegan"]), verdict: "bad", count: [7, 7] }
+    ]);
 
     function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
     var passed = 0, rows = "";
