@@ -2,6 +2,7 @@
 // SafeOrder 손님 화면
 // 8단계: 메뉴판, 내 알레르기·식단, 메뉴별 판정과 이유 (PRD #4-1, #4-2)
 // 9단계: 장바구니, 테이블 번호, 요청사항, 주문 전 경고 (PRD #4-3)
+// 10단계: 주문을 서버(worker/order-api.js)로 보내기 (PRD #4-4, Todo 10-5)
 // - 판정은 LabelLens에서 만든 js/matcher.js(성분 사전 + 규칙)를 그대로 씀
 // =========================================================
 (function () {
@@ -274,10 +275,47 @@
     if (!cartItems().length) return;
     if (!currentTable()) { msg.textContent = LL.t("needTable"); $("tableSel").focus(); return; }
     if (!$("badBox").hidden && !$("ack").checked) { msg.textContent = LL.t("needAck"); $("ack").focus(); return; }
-    window.LL_lastOrder = buildOrder();   // 테스트용: 보낼 주문서
+    var order = buildOrder();
+    window.LL_lastOrder = order;   // 테스트용: 보낸 주문서
+    var btn = $("placeOrder");
+    btn.disabled = true;
     msg.className = "form-msg";
-    msg.textContent = LL.t("notConnected");
+    msg.textContent = LL.t("sending");
+    sendOrder(order).then(function (res) {
+      // 주문 번호와 확인용 열쇠(token)를 이 기기에 저장 (11단계에서 내 주문 상태를 볼 때 씀)
+      saveMyOrder({ id: res.id, token: res.token, table: order.table, at: Date.now(),
+        items: order.items.map(function (i) { return { id: i.id, qty: i.qty }; }) });
+      cart = {}; saveCart(); $("memo").value = ""; $("ack").checked = false;
+      closeSheet(); renderMenu(); renderCartBar();
+      toast(LL.t("orderSent", { id: res.id }));
+    }).catch(function () {
+      msg.className = "form-msg err";
+      msg.textContent = LL.t("sendFailed");
+    }).then(function () { btn.disabled = false; });
   });
+
+  // ---------- 주문 서버 연결 (10-5) ----------
+  LL.API_URL = "https://safeorder-api.2003lynn.workers.dev";
+  function sendOrder(order) {
+    return fetch(LL.API_URL + "/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order)
+    }).then(function (r) {
+      if (!r.ok) throw new Error("order " + r.status);
+      return r.json();
+    });
+  }
+  var MY_KEY = "safeorder.myorders.v1";
+  function loadMyOrders() {
+    try { return (JSON.parse(localStorage.getItem(MY_KEY) || "[]") || []).filter(function (o) { return Date.now() - o.at < 24 * 3600e3; }); }
+    catch (e) { return []; }
+  }
+  function saveMyOrder(o) {
+    var list = loadMyOrders(); list.unshift(o);
+    try { localStorage.setItem(MY_KEY, JSON.stringify(list.slice(0, 10))); } catch (e) { /* 저장이 막혀도 주문은 접수됨 */ }
+  }
+  LL.loadMyOrders = loadMyOrders;
 
   var toastTimer;
   function toast(text) {

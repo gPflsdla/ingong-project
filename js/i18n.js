@@ -39,7 +39,9 @@ window.LL = window.LL || {};
       warnNote: "Some dishes need a check. The kitchen will see this.",
       total: "Total", remove: "Remove", empty: "Your cart is empty.",
       placeOrder: "Place order", needTable: "Choose your table first.", needAck: "Check the box above to order dishes that don't fit your rules.",
-      notConnected: "Order sending is connected in the next step (order server). Your order wasn't sent.",
+      sending: "Sending your order…",
+      orderSent: "Order #{id} sent to the kitchen with your allergy info.",
+      sendFailed: "Couldn't send your order. Check your connection and try again, or tell the staff.",
       close: "Close"
     },
     ko: {
@@ -68,7 +70,9 @@ window.LL = window.LL || {};
       warnNote: "확인이 필요한 메뉴가 있어요. 주방에서도 함께 보게 돼요.",
       total: "합계", remove: "빼기", empty: "장바구니가 비어 있어요.",
       placeOrder: "주문하기", needTable: "먼저 테이블을 골라 주세요.", needAck: "내 조건에 맞지 않는 메뉴를 주문하려면 위 칸에 체크해 주세요.",
-      notConnected: "주문 보내기는 다음 단계(주문 서버)에서 연결돼요. 아직 주문이 전송되지 않았어요.",
+      sending: "주문을 보내는 중…",
+      orderSent: "{id}번 주문이 알레르기 정보와 함께 주방에 전달됐어요.",
+      sendFailed: "주문을 보내지 못했어요. 인터넷 연결을 확인하고 다시 시도하거나 직원에게 말씀해 주세요.",
       close: "닫기"
     }
   };
