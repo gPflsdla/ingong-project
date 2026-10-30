@@ -293,17 +293,25 @@
     }).catch(function () {
       msg.className = "form-msg err";
       msg.textContent = LL.t("sendFailed");
+      checkServer();   // 서버 문제인지 다시 확인해서 위쪽 안내를 띄움 (12-2)
     }).then(function () { btn.disabled = false; });
   });
 
   // ---------- 주문 서버 연결 (10-5) ----------
   LL.API_URL = "https://safeorder-api.2003lynn.workers.dev";
+  // 서버가 대답이 없을 때 "보내는 중…"에서 멈추지 않도록 시간 제한을 둠 (12-2)
+  function fetchT(url, opts, ms) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, ms) : null;
+    opts = opts || {}; if (ctl) opts.signal = ctl.signal;
+    return fetch(url, opts).then(function (r) { clearTimeout(timer); return r; }, function (e) { clearTimeout(timer); throw e; });
+  }
   function sendOrder(order) {
-    return fetch(LL.API_URL + "/orders", {
+    return fetchT(LL.API_URL + "/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(order)
-    }).then(function (r) {
+    }, 10000).then(function (r) {
       if (!r.ok) throw new Error("order " + r.status);
       return r.json();
     });
@@ -338,12 +346,31 @@
     var list = loadMyOrders().filter(function (o) { return myStatus[o.id] !== "done"; });
     if (!list.length) return;
     Promise.all(list.map(function (o) {
-      return fetch(LL.API_URL + "/orders/" + o.id + "?token=" + encodeURIComponent(o.token))
+      return fetchT(LL.API_URL + "/orders/" + o.id + "?token=" + encodeURIComponent(o.token), {}, 8000)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { if (d) myStatus[o.id] = d.status; })
         .catch(function () { /* 다음에 다시 확인 */ });
     })).then(function () { renderMyOrders(); myTimer = setTimeout(pollMyOrders, 5000); });
   }
+
+  // ---------- 서버 연결 확인 (12-2) ----------
+  // 서버가 안 되어도 메뉴판과 판정은 이 휴대폰 안에서 하므로 그대로 쓸 수 있음. 주문만 직원에게 하도록 안내
+  // 안 될 때는 20초마다 다시 확인하고, 되면 안내를 숨김
+  var serverTimer = null;
+  function checkServer() {
+    clearTimeout(serverTimer);
+    return fetchT(LL.API_URL + "/health", {}, 6000)
+      .then(function (r) { return r.ok ? r.json() : { ok: false }; })
+      .then(function (d) { return !!(d && d.ok); }, function () { return false; })
+      .then(function (ok) {
+        $("serverNote").hidden = ok;
+        if (!ok) serverTimer = setTimeout(checkServer, 20000);
+        return ok;
+      });
+  }
+  LL.checkServer = checkServer;
+  window.addEventListener("offline", function () { $("serverNote").hidden = false; });
+  window.addEventListener("online", checkServer);
 
   var toastTimer;
   function toast(text) {
@@ -365,5 +392,6 @@
   if (!hasPrefs()) $("rulesBox").open = true;
   renderAll();
   pollMyOrders();
+  checkServer();
   document.documentElement.setAttribute("data-app", "ready");
 })();

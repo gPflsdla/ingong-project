@@ -31,7 +31,7 @@ window.LL = window.LL || {};
       footer: "Dish ingredients come from the restaurant. If your allergy is serious, please also tell the staff.",
       // 9단계: 장바구니와 주문 화면
       add: "Add", added: "Added {name}", addedBad: "Added {name}. It doesn't fit your rules, so we'll check again before ordering.",
-      cartBar: "{n} items · {total}", viewCart: "Review order",
+      cartBar: "Cart {n} · {total}", viewCart: "Review order",
       cartTitle: "Your order", table: "Table", pickTable: "Choose your table", tableFromQr: "Table {n}",
       memo: "Request to the kitchen (optional)", memoPh: "e.g. less spicy, no green onion",
       sendsWith: "Sent to the kitchen with your order", noRulesSent: "No allergies or diet selected. Only your order will be sent.",
@@ -44,7 +44,8 @@ window.LL = window.LL || {};
       sending: "Sending your order…",
       orderSent: "Order #{id} sent to the kitchen with your allergy info.",
       sendFailed: "Couldn't send your order. Check your connection and try again, or tell the staff.",
-      close: "Close"
+      close: "Close",
+      serverDown: "Can't reach the ordering server right now. You can still use the menu and allergy marks. Please order with the staff for now."
     },
     ko: {
       tagline: "피해야 할 것을 한 번만 알려 주세요. 메뉴판에 표시해 드리고, 주문할 때 주방에도 함께 전해 드려요.",
@@ -77,7 +78,8 @@ window.LL = window.LL || {};
       sending: "주문을 보내는 중…",
       orderSent: "{id}번 주문이 알레르기 정보와 함께 주방에 전달됐어요.",
       sendFailed: "주문을 보내지 못했어요. 인터넷 연결을 확인하고 다시 시도하거나 직원에게 말씀해 주세요.",
-      close: "닫기"
+      close: "닫기",
+      serverDown: "지금 주문 서버에 연결할 수 없어요. 메뉴판과 알레르기 표시는 그대로 쓸 수 있어요. 주문은 직원에게 말씀해 주세요."
     }
   };
 

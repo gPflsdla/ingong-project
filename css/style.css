@@ -241,3 +241,8 @@ body.no-scroll { overflow: hidden; }
 .mo-st.new { background: var(--accent-soft); color: var(--accent); }
 .mo-st.confirmed { background: var(--warn-soft); color: var(--warn); }
 .mo-st.done { background: var(--ok); color: var(--bg); }
+
+/* 12단계: 주문 서버 연결 안내 (Todo 12-2) */
+.server-note { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.5;
+  color: var(--warn); background: var(--warn-soft); border: 1px solid var(--warn); }
+.server-note[hidden] { display: none; }
