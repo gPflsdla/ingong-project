@@ -150,6 +150,7 @@ body { word-break: keep-all; overflow-wrap: anywhere; }
 .drop p { margin: 0; font-size: 13.5px; color: var(--muted); }
 .drop.over { border-color: var(--accent); background: var(--accent-soft); }   /* 사진을 끌어다 올렸을 때 */
 .drop-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.drop .ai-note { font-size: 12px; }   /* 6-8: 사진이 AI로 보내진다는 안내 */
 
 /* 앱 안 카메라 */
 .camera { display: flex; flex-direction: column; gap: 10px; }

@@ -148,10 +148,26 @@
   function notice(key) { noticeKey = key; $("notice").textContent = key ? LL.t(key) : ""; $("notice").hidden = !key; }
 
   // 사진(이미지 또는 canvas)을 받아 글자를 읽고 입력칸에 채움
+  // 6-6: 먼저 AI 글자 인식으로 읽고, 실패하면(서버 오류, 무료 사용량 초과, 인터넷 끊김) 브라우저 안 인식기로 대신 읽음 (6-7)
   function readImage(source, previewUrl) {
     notice(null);
     $("preview").hidden = false;
     $("previewImg").src = previewUrl;
+    setOcr("readingAi", 0.15);
+    LL.aiRecognize(source).then(function (r) {
+      window.LL_lastAi = r;   // 테스트·디버깅용: 마지막 AI 인식 결과
+      if (!/[가-힣]/.test(r.text)) { setOcr("unreadableAi", 0); return; }
+      $("text").value = r.text;
+      setOcr("doneAi", 1);
+      analyze();
+    }).catch(function () {
+      notice("aiFallback");
+      readImageLocal(source);
+    });
+  }
+
+  // 브라우저 안 인식기(Tesseract.js)로 읽기 — AI 인식을 못 쓸 때만 사용
+  function readImageLocal(source) {
     setOcr("reading", 0.02);
     var canvas = LL.prepImage(source);
     LL.recognize(canvas, function (stage, p) { setOcr(stage, p); }).then(function (r) {
