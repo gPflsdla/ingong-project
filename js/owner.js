@@ -91,6 +91,20 @@
       });
     } catch (e) { /* 소리를 못 내도 화면 알림은 보임 */ }
   }
+  // 14-3: 소리가 켜져 있는지 확인하고, 꺼져 있으면 "알림음 켜기" 버튼을 보여 줌
+  function soundReady() { return !!audio && audio.state === "running"; }
+  function updateSoundBtn() { $("soundOn").hidden = $("board").hidden || soundReady(); }
+  function unlockSound() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state !== "running") audio.resume().then(updateSoundBtn, updateSoundBtn);
+    } catch (e) { /* 소리를 못 내도 화면 알림은 보임 */ }
+    updateSoundBtn();
+  }
+  $("soundOn").addEventListener("click", function () { unlockSound(); beep(); });
+  // 화면 어디든 한 번 누르면 소리가 켜짐
+  document.addEventListener("pointerdown", function () { if (!soundReady()) unlockSound(); });
+
   function alertNew(list) {
     beep();
     var allergy = list.some(function (o) { return o.hasAllergy; });
@@ -232,6 +246,7 @@
     $("login").hidden = true; $("board").hidden = false;
     orders = {}; calls = {}; since = 0; firstLoad = true;
     clearTimeout(timer); poll();
+    setTimeout(updateSoundBtn, 300);
   }
   function logout(msg) {
     clearTimeout(timer); timer = null; code = "";

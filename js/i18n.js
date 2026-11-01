@@ -1,6 +1,6 @@
 // =========================================================
 // 화면 문구 한국어/영어 (PRD #4-7) — LabelLens 5-6에서 만든 구조를 재사용하고 문구만 SafeOrder용으로 바꿈
-// - index.html의 data-i18n="키" 요소는 LL.applyI18n()이 바꿈
+// - 손님 화면(order.html)의 data-i18n="키" 요소는 LL.applyI18n()이 바꿈
 // - 자바스크립트에서 만드는 문구는 LL.t("키", { 이름: 값 }) 로 꺼내 씀
 // - 처음에는 브라우저 언어를 따르고, 고른 언어는 이 브라우저에 기억함
 // =========================================================
@@ -21,11 +21,11 @@ window.LL = window.LL || {};
       hidden: "{n} dishes hidden because they don't fit your rules.",
       ingredients: "Ingredients", whyTitle: "Why", noRulesHint: "Pick what you can't eat in step 1 to see which dishes fit.",
       showDetail: "Details", hideDetail: "Close",
-      facilityNote: "Shared kitchen",
+      facilityNote: "may be present",
       // 이유
       r_allergy_bad: "Contains {name}", r_allergy_bad_why: "You marked {name} as an allergy.",
       r_allergy_warn: "May contain {name}", r_allergy_warn_why: "Contains {tag}.",
-      r_facility: "{name} may be present", r_facility_why: "Made in a kitchen that also handles {name}.",
+      r_facility: "{name} may be present", r_facility_why: "Prepared in the same kitchen or frying oil as {name}.",
       r_diet_bad: "Not {diet}", r_diet_bad_why: "Contains {tag}.",
       r_diet_warn: "Check for {diet}", r_diet_warn_why: "Contains {tag}.",
       footer: "Dish ingredients come from the restaurant. If your allergy is serious, please also tell the staff.",
@@ -51,6 +51,7 @@ window.LL = window.LL || {};
       call_water: "Water, please", call_staff: "Call a staff member", call_utensils: "Cutlery & plates", call_napkin: "Napkins, please", call_bill: "Check, please",
       callSent: "Sent: {what}. We'll be right there!", callRequested: "Requested", callFailed: "Couldn't send it. Please ask a staff member directly.",
       st_deleted: "Cleared by the restaurant",
+      ingrOriginal: "Original label (Korean)", clearDone: "Clear finished",
       about: "About this dish", imgNote: "Menu pictures are illustrations and may look different from the real dish.",
       serverDown: "Can't reach the ordering server right now. You can still use the menu and allergy marks. Please order with the staff for now."
     },
@@ -64,10 +65,10 @@ window.LL = window.LL || {};
       hidden: "내 조건에 맞지 않는 메뉴 {n}개를 숨겼어요.",
       ingredients: "원재료", whyTitle: "이유", noRulesHint: "1번에서 못 먹는 것을 고르면 메뉴마다 먹을 수 있는지 표시돼요.",
       showDetail: "자세히", hideDetail: "닫기",
-      facilityNote: "같은 주방",
+      facilityNote: "혼입 가능",
       r_allergy_bad: "{name} 들어 있음", r_allergy_bad_why: "알레르기로 고른 항목이에요.",
       r_allergy_warn: "{name} 들어 있을 수 있음", r_allergy_warn_why: "{tag} 포함",
-      r_facility: "{name} 혼입 가능성", r_facility_why: "{nameEul} 다루는 같은 주방에서 만들어요.",
+      r_facility: "{name} 혼입 가능성", r_facility_why: "{nameEul} 다루는 같은 주방이나 같은 기름에서 만들어요.",
       r_diet_bad: "{diet} 불가", r_diet_bad_why: "{tag} 포함",
       r_diet_warn: "{diet} 확인 필요", r_diet_warn_why: "{tag} 포함",
       footer: "메뉴의 원재료는 식당이 알려 준 정보예요. 알레르기가 심하다면 직원에게도 꼭 말씀해 주세요.",
@@ -92,6 +93,7 @@ window.LL = window.LL || {};
       call_water: "물 주세요", call_staff: "직원 불러 주세요", call_utensils: "수저·앞접시 주세요", call_napkin: "휴지 주세요", call_bill: "계산할게요",
       callSent: "\"{what}\" 요청을 보냈어요. 곧 갈게요!", callRequested: "요청함", callFailed: "호출을 보내지 못했어요. 직원에게 직접 말씀해 주세요.",
       st_deleted: "가게에서 정리한 주문",
+      ingrOriginal: "원문", clearDone: "끝난 주문 지우기",
       about: "음식 소개", imgNote: "메뉴 그림은 실제 음식과 다를 수 있어요.",
       serverDown: "지금 주문 서버에 연결할 수 없어요. 메뉴판과 알레르기 표시는 그대로 쓸 수 있어요. 주문은 직원에게 말씀해 주세요."
     }

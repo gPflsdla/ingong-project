@@ -83,3 +83,7 @@
 .actions { display: flex; flex-direction: column; gap: 6px; }
 .btn.del { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, transparent); font-size: 13px; font-weight: 600; padding: 3px 12px; }
 
+
+/* 14-3: 알림음 켜기 */
+.sound-on { font: inherit; cursor: pointer; width: 100%; margin-top: 12px; padding: 12px 16px; border-radius: 14px; border: 1.5px dashed var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; text-align: left; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.sound-on span { font-weight: 400; font-size: 13px; color: var(--muted); }

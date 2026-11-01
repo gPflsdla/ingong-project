@@ -38,7 +38,8 @@ window.LL = window.LL || {};
   // "이 제품은 땅콩을 사용한 제품과 같은 제조시설에서 제조하고 있습니다" 문장의 범위를 찾음 (5-3)
   // 이 범위의 성분은 원재료가 아니라 혼입 가능성 (3단계에서 원재료로 잘못 판정된 것을 보고 추가)
   function facilitySpan(c) {
-    var m = c.search(/(같은|동일한|동일)(제조)?시설/);
+    // 14-1: 식당 메뉴의 "같은 기름에서 튀겨요"도 같은 방식으로 혼입 가능성으로 봄
+    var m = c.search(/(같은|동일한|동일)(제조)?(시설|기름)/);
     if (m === -1) return null;
     var lineStart = Math.max(c.lastIndexOf("\n", m), c.lastIndexOf(".", m)) + 1;
     var s1 = c.lastIndexOf("이제품은", m);

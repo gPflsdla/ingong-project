@@ -78,7 +78,8 @@ LL.MENU = [
     introKo: "양념한 당면을 김에 말아 바삭하게 튀겼어요. 겉은 바삭하고 속은 쫄깃해요.",
     introEn: "Seasoned glass noodles rolled in seaweed and deep-fried. Crispy outside, chewy inside.",
     img: "images/menu/gimmari.svg",
-    ingredients: "김말이(당면, 김, 당근, 양파), 튀김가루(소맥분, 옥수수전분, 정제소금), 대두유" },
+    // 14-1: 모둠튀김(오징어, 새우)과 같은 기름에서 튀기므로 혼입 가능성을 적어 둠 → 새우·오징어 알레르기는 "확인 필요"
+    ingredients: "김말이(당면, 김, 당근, 양파), 튀김가루(소맥분, 옥수수전분, 정제소금), 대두유. 오징어, 새우를 튀기는 같은 기름에서 튀겨요" },
 
   { id: "ramyeon", cat: "noodle", price: 4000, ko: "라면", en: "Ramyeon",
     descKo: "계란과 대파를 넣은 라면", descEn: "Instant noodles with egg and green onion",

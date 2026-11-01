@@ -77,7 +77,11 @@
 
     <!-- 11단계: 내 주문 상태 (PRD #4-6, Todo 11-5) -->
     <section class="panel my-orders" id="myOrders" aria-live="polite" hidden>
-      <h2 data-i18n="myOrders"></h2>
+      <div class="mo-head">
+        <h2 data-i18n="myOrders"></h2>
+        <!-- 14-4: 끝난 주문(조리 완료, 가게에서 정리한 주문)은 손님이 목록에서 지울 수 있음 -->
+        <button type="button" class="btn link" id="clearDone" data-i18n="clearDone" hidden></button>
+      </div>
       <ul id="myOrderList"></ul>
     </section>
 

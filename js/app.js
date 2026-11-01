@@ -76,6 +76,26 @@
     return { title: title, why: LL.t(key + "_why", vars) };
   }
 
+  // 14-2: 걸린 원재료 이름을 지금 언어로 (영어 화면에서는 "땅콩가루" → "peanut powder")
+  var DICT_BY_KO = {};
+  LL.DICT.forEach(function (d) { if (!DICT_BY_KO[d.ko]) DICT_BY_KO[d.ko] = d; });
+  function termName(ko) { return LL.lang === "ko" || !DICT_BY_KO[ko] ? ko : DICT_BY_KO[ko].en; }
+  function termList(list) { return list.map(termName).join(", "); }
+  LL.termName = termName;
+
+  // 영어 화면: 찾은 원재료를 영어로 옮긴 목록 (걸린 것은 같은 색으로 강조)
+  function englishIngredients(j) {
+    var seen = {}, parts = [];
+    j.hits.forEach(function (h) {
+      if (seen[h.entry.ko]) return; seen[h.entry.ko] = true;
+      var hit = j.reasons.some(function (r) { return r.terms.indexOf(h.entry.ko) !== -1; });
+      var bad = hit && j.reasons.some(function (r) { return r.level === "bad" && r.terms.indexOf(h.entry.ko) !== -1; });
+      var name = esc(h.entry.en) + (h.facility ? " (" + esc(LL.t("facilityNote")) + ")" : "");
+      parts.push(hit ? '<mark class="' + (bad ? "x" : "w") + '">' + name + "</mark>" : name);
+    });
+    return parts.join(", ");
+  }
+
   // 원재료 글자에서 내 조건에 걸린 부분만 강조
   function markedIngredients(item, j) {
     var text = item.ingredients, out = "", pos = 0;
@@ -98,10 +118,11 @@
   function cardHTML(item) {
     var j = judge(item), v = j.verdict === "unknown" ? "warn" : j.verdict;
     var terms = [];
-    j.reasons.forEach(function (r) { r.terms.forEach(function (t) { if (terms.indexOf(t) === -1) terms.push(t); }); });
+    // 카드에는 판정과 같은 단계의 원재료만 (못 먹어요 옆에 "확인 필요" 원재료가 섞이지 않게, 14-2)
+    j.reasons.forEach(function (r) { if (r.level !== v) return; r.terms.forEach(function (t) { if (terms.indexOf(t) === -1) terms.push(t); }); });
     var verdict = v === "none" ? "" : v === "ok"
       ? '<span class="verdict ok">✓ ' + esc(LL.t("b_ok")) + "</span>"
-      : '<span class="verdict ' + v + '"><b>' + esc(LL.t("b_" + v)) + "</b>" + (terms.length ? ' <span lang="ko">' + esc(terms.join(", ")) + "</span>" : "") + "</span>";
+      : '<span class="verdict ' + v + '"><b>' + esc(LL.t("b_" + v)) + "</b>" + (terms.length ? " <span>" + esc(termList(terms)) + "</span>" : "") + "</span>";
     var open = openId === item.id;
     var desc = LL.lang === "ko" ? item.descKo : item.descEn;
     var intro = LL.lang === "ko" ? item.introKo : item.introEn;
@@ -113,10 +134,14 @@
         (j.reasons.length ? "<h4>" + esc(LL.t("whyTitle")) + '</h4><ul class="reasons">' + j.reasons.map(function (r) {
           var p = reasonParts(r);
           return '<li class="reason ' + r.level + '"><span class="dot" aria-hidden="true"></span><div><div class="what">' + esc(p.title) + " " +
-            r.terms.map(function (k) { return '<span class="kterm" lang="ko">' + esc(k) + "</span>"; }).join(" ") +
+            r.terms.map(function (k) {
+              return '<span class="kterm">' + esc(termName(k)) + (LL.lang === "ko" ? "" : ' <span class="kterm-ko" lang="ko">' + esc(k) + "</span>") + "</span>";
+            }).join(" ") +
             '</div><div class="why">' + esc(p.why) + "</div></div></li>";
         }).join("") + "</ul>" : "") +
-        "<h4>" + esc(LL.t("ingredients")) + '</h4><p class="ingr" lang="ko">' + markedIngredients(item, j) + "</p>" +
+        "<h4>" + esc(LL.t("ingredients")) + "</h4>" +
+        (LL.lang === "ko" ? "" : '<p class="ingr">' + englishIngredients(j) + "</p>" + '<p class="ingr-orig-h">' + esc(LL.t("ingrOriginal")) + "</p>") +
+        '<p class="ingr' + (LL.lang === "ko" ? "" : " ingr-orig") + '" lang="ko">' + markedIngredients(item, j) + "</p>" +
       "</div>";
     var inCart = cart[item.id] || 0;
     return '<article class="item ' + v + (open ? " open" : "") + '" data-id="' + item.id + '">' +
@@ -263,7 +288,7 @@
     $("badList").innerHTML = bad.map(function (c) {
       var terms = [];
       c.judge.reasons.forEach(function (r) { if (r.level === "bad") r.terms.forEach(function (t) { if (terms.indexOf(t) === -1) terms.push(t); }); });
-      return "<li><b>" + esc(label(c.item)) + '</b> <span lang="ko">' + esc(terms.join(" · ")) + "</span></li>";
+      return "<li><b>" + esc(label(c.item)) + "</b> <span>" + esc(termList(terms)) + "</span></li>";
     }).join("");
     if (!bad.length) $("ack").checked = false;
     $("warnNote").hidden = !items.some(function (c) { return c.judge.verdict === "warn"; });
@@ -368,6 +393,7 @@
   function renderMyOrders() {
     var list = loadMyOrders();
     $("myOrders").hidden = !list.length;
+    $("clearDone").hidden = !list.some(function (o) { return myStatus[o.id] === "done" || myStatus[o.id] === "deleted"; });
     $("myOrderList").innerHTML = list.map(function (o) {
       var st = myStatus[o.id] || "unknown";
       var names = o.items.map(function (i) { var m = menuById(i.id); return (m ? label(m) : i.id) + " ×" + i.qty; }).join(", ");
@@ -375,6 +401,12 @@
         '<span class="mo-st ' + st + '">' + esc(LL.t("st_" + st)) + "</span></li>";
     }).join("");
   }
+  // 14-4: 끝난 주문을 이 기기의 목록에서 지움 (가게 쪽 주문은 그대로)
+  $("clearDone").addEventListener("click", function () {
+    var keep = loadMyOrders().filter(function (o) { return myStatus[o.id] !== "done" && myStatus[o.id] !== "deleted"; });
+    try { localStorage.setItem(MY_KEY, JSON.stringify(keep)); } catch (e) { /* 무시 */ }
+    renderMyOrders();
+  });
   function pollMyOrders() {
     clearTimeout(myTimer);
     var list = loadMyOrders().filter(function (o) { return myStatus[o.id] !== "done" && myStatus[o.id] !== "deleted"; });

@@ -41,7 +41,7 @@
       <!-- 12-11: 평가하시는 분이 바로 체험할 수 있게 체험용 코드를 공개 -->
       <div class="demo-code">
         <p><b>체험용 가게 코드</b> <code>gagae1111</code></p>
-        <p class="hint">과제 시연용 코드라 누구나 볼 수 있어요. 주문은 24시간 뒤 자동으로 지워져요.</p>
+        <p class="hint">과제 시연용 코드라 누구나 볼 수 있어요. 24시간 지난 주문은 사장님 화면이 주문을 불러올 때 지워져요.</p>
         <button type="button" class="btn" id="demoFill">체험용 코드로 들어가기</button>
       </div>
     </section>
@@ -52,6 +52,8 @@
         <div class="summary-row" id="summaryRow"></div>
         <button type="button" class="btn reset" id="resetAll">전체 리셋</button>
       </div>
+      <!-- 14-3: 새로고침 뒤에는 브라우저 규칙상 한 번 눌러야 알림음이 남 -->
+      <button type="button" class="sound-on" id="soundOn" hidden>🔔 알림음 켜기 <span>새로고침하면 브라우저가 소리를 막아서, 한 번 눌러 주셔야 새 주문 소리가 나요</span></button>
       <!-- 12-13: 손님 호출 (물, 직원, 수저 등) -->
       <section class="calls" id="callsBox" hidden>
         <h2 class="col-title">손님 호출</h2>
